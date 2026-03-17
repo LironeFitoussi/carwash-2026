@@ -1,0 +1,22 @@
+{
+  "name": "mern-ts-template",
+  "version": "1.0.0",
+  "description": "MERN Stack TypeScript Template with Auth0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "boot": "node scripts/boot.js",
+    "build": "node scripts/build.js",
+    "install:all": "npm install --prefix Server && npm install --prefix Client",
+    "dev": "node scripts/check-docker.js && docker-compose up --build server client",
+    "dev:detached": "node scripts/check-docker.js && docker-compose up -d --build",
+    "start": "node scripts/check-docker.js && docker-compose -f docker-compose.prod.yml up -d --build",
+    "stop": "docker-compose down",
+    "logs": "docker-compose logs -f",
+    "reset:mongodb": "docker-compose down && docker volume rm mern-ts-tempalte-2_mongodb_data 2>/dev/null || docker volume rm mern-mongodb_data 2>/dev/null || echo 'Volume not found or already removed'"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
+

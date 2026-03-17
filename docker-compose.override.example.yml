@@ -1,0 +1,23 @@
+# docker-compose.override.yml
+# This file allows you to override docker-compose.yml settings locally
+# Copy this file to docker-compose.override.yml (it's automatically loaded)
+# This file is gitignored, so your local customizations won't be committed
+
+version: '3.8'
+
+services:
+  # Example: Override server to use a different port locally
+  # server:
+  #   ports:
+  #     - "3001:3000"
+  
+  # Example: Add additional environment variables
+  # server:
+  #   environment:
+  #     - DEBUG=true
+  
+  # Example: Mount additional volumes
+  # server:
+  #   volumes:
+  #     - ./local-data:/app/data
+

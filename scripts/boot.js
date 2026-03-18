@@ -17,8 +17,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const rootDir = join(__dirname, '..');
 
-const RootEnvExample = join(rootDir, '.env.example');
-const RootEnv = join(rootDir, '.env');
 const ServerEnvExample = join(rootDir, 'Server', '.env.example');
 const ServerEnv = join(rootDir, 'Server', '.env');
 const ClientEnvExample = join(rootDir, 'Client', '.env.example');
@@ -28,19 +26,6 @@ console.log('🚀 Starting boot process...\n');
 
 // Step 1: Copy .env.example to .env files
 console.log('📋 Setting up environment files...');
-
-// Root .env (for Docker)
-if (existsSync(RootEnvExample)) {
-  if (existsSync(RootEnv)) {
-    console.log('   ⚠️  .env already exists, skipping...');
-  } else {
-    copyFileSync(RootEnvExample, RootEnv);
-    console.log('   ✅ Created .env from .env.example');
-  }
-} else {
-  console.log('   ⚠️  .env.example not found at root, skipping...');
-  console.log('   💡 Create .env at root for Docker environment variables');
-}
 
 // Server .env
 if (existsSync(ServerEnvExample)) {
@@ -130,9 +115,8 @@ try {
 
 console.log('✨ Boot process completed successfully!');
 console.log('\n📝 Next steps:');
-console.log('   1. Edit .env at root with your Auth0 credentials (REQUIRED for Docker)');
-console.log('   2. Edit Server/.env with your actual values (if running without Docker)');
-console.log('   3. Edit Client/.env with your actual values (if running without Docker)');
-console.log('   4. Run "npm run dev" to start with Docker (recommended)');
+console.log('   1. Edit Server/.env with your Auth0 credentials and MongoDB URI');
+console.log('   2. Edit Client/.env with your Auth0 credentials');
+console.log('   3. Run "npm run dev" to start with Docker Watch (recommended)');
 console.log('   OR run "npm run dev" in Server/ and Client/ separately (without Docker)\n');
 

@@ -1,5 +1,5 @@
 import type { ComponentType, ReactNode } from "react";
-import { Calendar, Users, UserCheck, LayoutDashboard } from "lucide-react";
+import { Calendar, Users, UserCheck, LayoutDashboard, Settings } from "lucide-react";
 import type { SVGProps } from "react";
 
 import Auth from "../pages/Auth";
@@ -10,6 +10,8 @@ import Clients from "../pages/Clients";
 import NewClient from "../pages/NewClient";
 import Workers from "../pages/Workers";
 import AddWorker from "../pages/AddWorker";
+import CarSizeSettings from "../pages/CarSizeSettings";
+import WorkerSchedule from "../pages/WorkerSchedule";
 
 // Type for Lucide icons
 export type LucideIcon = ComponentType<SVGProps<SVGSVGElement>>;
@@ -115,6 +117,28 @@ export const routeConfig: RouteConfig[] = [
         name: "Add Worker",
         Component: AddWorker,
         showInSidebar: true,
+      },
+      {
+        path: "schedule",
+        name: "Schedule",
+        Component: WorkerSchedule,
+        showInSidebar: true,
+      },
+    ],
+  },
+  {
+    path: "/settings",
+    name: "Settings",
+    icon: Settings,
+    showInSidebar: true,
+    requireAuth: true,
+    children: [
+      {
+        path: "/settings/car-sizes",
+        name: "Car Sizes",
+        Component: CarSizeSettings,
+        showInSidebar: true,
+        index: true,
       },
     ],
   },

@@ -1,4 +1,5 @@
 import type { Document, Model, Types } from "mongoose";
+import type { CarSize } from "./carSizeConfigTypes";
 
 export interface IAppointment {
     clientId: Types.ObjectId;
@@ -9,13 +10,14 @@ export interface IAppointment {
     notes?: string;
     isPickedUp: boolean;
     pickupLocation?: string;
-    vehicleType?: 'small' | '5-seater' | '7-seater';
+    vehicleType: CarSize;
+    durationMinutes: number;
 }
 
 export interface IAppointmentDoc extends IAppointment, Document {
     createdAt: Date;
     updatedAt: Date;
-    conflictsWith(startTime: Date): boolean;
+    conflictsWith(startTime: Date, durationMinutes: number): boolean;
 }
 
 export interface IAppointmentModel extends Model<IAppointmentDoc> {}

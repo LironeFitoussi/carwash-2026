@@ -1,43 +1,75 @@
 import type { Request, Response } from "express";
 import Appointment from "../models/Appointment.js";
 import Worker from "../models/Worker.js";
+import WorkerAvailability from "../models/WorkerAvailability.js";
 import { createAppointmentSchema, updateAppointmentSchema } from "../zod/appointmentsZod.js";
 import { AppError } from "../utils/errorHandler.js";
+import { getDurationMinutes } from "../utils/carSizeDuration.js";
+import type { CarSize } from "../types/index";
+
+function parseTime(timeStr: string): { hours: number; minutes: number } {
+    const parts = timeStr.split(':');
+    return { hours: Number(parts[0]), minutes: Number(parts[1]) };
+}
+
+function checkHours(startTime: Date, durationMinutes: number, scheduleStart: string, scheduleEnd: string): boolean {
+    const startTotal = startTime.getUTCHours() * 60 + startTime.getUTCMinutes();
+    const endTotal = startTotal + durationMinutes;
+    const openParsed = parseTime(scheduleStart);
+    const closeParsed = parseTime(scheduleEnd);
+    const openMinutes = openParsed.hours * 60 + openParsed.minutes;
+    const closeMinutes = closeParsed.hours * 60 + closeParsed.minutes;
+    return startTotal >= openMinutes && endTotal <= closeMinutes;
+}
+
+async function getAvailabilityForDate(workerId: string, date: Date) {
+    const dayStart = new Date(date);
+    dayStart.setUTCHours(0, 0, 0, 0);
+    return WorkerAvailability.findOne({ workerId, date: dayStart });
+}
 
 const POPULATE_OPTIONS = [
-    { path: 'clientId', select: 'name email phone' },
+    { path: 'clientId', select: 'name email phone carType' },
     { path: 'workerId', select: 'name email' },
 ];
 
-function checkBusinessHours(startTime: Date): boolean {
-    const hours = startTime.getUTCHours();
-    const minutes = startTime.getUTCMinutes();
-    const totalMinutes = hours * 60 + minutes;
-    const openMinutes = 5 * 60 + 30;  // 05:30
-    const closeMinutes = 18 * 60 + 30; // 18:30
-    return totalMinutes >= openMinutes && totalMinutes <= closeMinutes;
+function findOverlappingQuery(workerId: string, startTime: Date, durationMinutes: number, excludeId?: string) {
+    const newEndTime = new Date(startTime.getTime() + durationMinutes * 60_000);
+    const filter: any = {
+        workerId,
+        status: { $nin: ['cancelled'] },
+        $expr: {
+            $and: [
+                { $lt: ['$startTime', newEndTime] },
+                { $lt: [startTime, { $add: ['$startTime', { $multiply: ['$durationMinutes', 60000] }] }] },
+            ],
+        },
+    };
+    if (excludeId) {
+        filter._id = { $ne: excludeId };
+    }
+    return Appointment.find(filter);
 }
 
 class AppointmentsController {
     async createAppointment(req: Request, res: Response) {
         const data = createAppointmentSchema.parse(req.body);
         const startTime = new Date(data.startTime);
+        const durationMinutes = await getDurationMinutes(data.vehicleType as CarSize);
 
         const worker = await Worker.findById(data.workerId);
         if (!worker) throw new AppError('Worker not found', 404);
 
-        if (!checkBusinessHours(startTime)) {
-            throw new AppError('Appointment must be between 05:30 and 18:30', 400);
+        const availability = await getAvailabilityForDate(data.workerId, startTime);
+        if (!availability) {
+            throw new AppError('Worker is not available on this date', 400);
         }
 
-        const conflicts = await Appointment.find({
-            workerId: data.workerId,
-            status: { $nin: ['cancelled'] },
-            startTime: {
-                $gte: new Date(startTime.getTime() - 59 * 60 * 1000),
-                $lte: new Date(startTime.getTime() + 59 * 60 * 1000),
-            },
-        });
+        if (!checkHours(startTime, durationMinutes, availability.startTime, availability.endTime)) {
+            throw new AppError(`Appointment must fit within worker's hours (${availability.startTime} - ${availability.endTime}). Duration: ${durationMinutes} minutes`, 400);
+        }
+
+        const conflicts = await findOverlappingQuery(data.workerId, startTime, durationMinutes);
 
         if (conflicts.length > 0) {
             res.status(409).json({
@@ -48,7 +80,7 @@ class AppointmentsController {
             return;
         }
 
-        const appointment = await Appointment.create({ ...data, startTime });
+        const appointment = await Appointment.create({ ...data, startTime, durationMinutes });
         const populated = await appointment.populate(POPULATE_OPTIONS);
         res.status(201).json({ success: true, data: populated });
     }
@@ -79,7 +111,8 @@ class AppointmentsController {
     }
 
     async switchStatus(req: Request, res: Response) {
-        const { id, status } = req.params;
+        const id = req.params.id!;
+        const status = req.params.status!;
         const validStatuses = ['pending', 'confirmed', 'completed', 'cancelled'];
         if (!validStatuses.includes(status)) {
             throw new AppError('Invalid status', 400);
@@ -97,23 +130,25 @@ class AppointmentsController {
         const data = updateAppointmentSchema.parse(req.body);
         const startTime = data.startTime ? new Date(data.startTime) : undefined;
 
+        let durationMinutes: number | undefined;
+        if (data.vehicleType) {
+            durationMinutes = await getDurationMinutes(data.vehicleType as CarSize);
+        }
+
         if (startTime) {
             const workerId = data.workerId;
+            const effectiveDuration = durationMinutes;
 
-            if (!checkBusinessHours(startTime)) {
-                throw new AppError('Appointment must be between 05:30 and 18:30', 400);
-            }
+            if (workerId && effectiveDuration) {
+                const availability = await getAvailabilityForDate(workerId, startTime);
+                if (!availability) {
+                    throw new AppError('Worker is not available on this date', 400);
+                }
+                if (!checkHours(startTime, effectiveDuration, availability.startTime, availability.endTime)) {
+                    throw new AppError(`Appointment must fit within worker's hours (${availability.startTime} - ${availability.endTime}). Duration: ${effectiveDuration} minutes`, 400);
+                }
 
-            if (workerId) {
-                const conflicts = await Appointment.find({
-                    workerId,
-                    status: { $nin: ['cancelled'] },
-                    _id: { $ne: req.params.id },
-                    startTime: {
-                        $gte: new Date(startTime.getTime() - 59 * 60 * 1000),
-                        $lte: new Date(startTime.getTime() + 59 * 60 * 1000),
-                    },
-                });
+                const conflicts = await findOverlappingQuery(workerId, startTime, effectiveDuration, req.params.id);
 
                 if (conflicts.length > 0) {
                     res.status(409).json({
@@ -126,7 +161,10 @@ class AppointmentsController {
             }
         }
 
-        const updateData = startTime ? { ...data, startTime } : data;
+        const updateData: any = { ...data };
+        if (startTime) updateData.startTime = startTime;
+        if (durationMinutes) updateData.durationMinutes = durationMinutes;
+
         const appointment = await Appointment.findByIdAndUpdate(
             req.params.id,
             updateData,
@@ -140,6 +178,103 @@ class AppointmentsController {
         const appointment = await Appointment.findByIdAndDelete(req.params.id);
         if (!appointment) throw new AppError('Appointment not found', 404);
         res.status(200).json({ success: true, message: 'Appointment deleted successfully' });
+    }
+
+    async getNextAvailable(req: Request, res: Response) {
+        const { workerId, carSize } = req.query;
+
+        if (!workerId || typeof workerId !== 'string') {
+            throw new AppError('workerId query parameter is required', 400);
+        }
+        if (!carSize || typeof carSize !== 'string') {
+            throw new AppError('carSize query parameter is required', 400);
+        }
+
+        const validSizes = ['small', 'regular', 'big'];
+        if (!validSizes.includes(carSize)) {
+            throw new AppError('Invalid carSize. Must be: small, regular, or big', 400);
+        }
+
+        const worker = await Worker.findById(workerId);
+        if (!worker) throw new AppError('Worker not found', 404);
+
+        const durationMinutes = await getDurationMinutes(carSize as CarSize);
+        const durationMs = durationMinutes * 60_000;
+
+        const now = new Date();
+        const scanDays = 30;
+
+        // Get all availability dates for this worker in the next N days
+        const scanStart = new Date(now);
+        scanStart.setUTCHours(0, 0, 0, 0);
+        const scanEnd = new Date(now);
+        scanEnd.setDate(scanEnd.getDate() + scanDays);
+        scanEnd.setUTCHours(23, 59, 59, 999);
+
+        const availabilityDates = await WorkerAvailability.find({
+            workerId,
+            date: { $gte: scanStart, $lte: scanEnd },
+        }).sort({ date: 1 });
+
+        if (availabilityDates.length === 0) {
+            throw new AppError(`Worker has no available dates in the next ${scanDays} days`, 404);
+        }
+
+        // Fetch all non-cancelled appointments in the window
+        const appointments = await Appointment.find({
+            workerId,
+            status: { $nin: ['cancelled'] },
+            startTime: { $gte: scanStart, $lte: scanEnd },
+        }).sort({ startTime: 1 });
+
+        // Scan each available date
+        for (const avail of availabilityDates) {
+            const openParsed = parseTime(avail.startTime);
+            const closeParsed = parseTime(avail.endTime);
+
+            const openTime = new Date(avail.date);
+            openTime.setUTCHours(openParsed.hours, openParsed.minutes, 0, 0);
+
+            const closeTime = new Date(avail.date);
+            closeTime.setUTCHours(closeParsed.hours, closeParsed.minutes, 0, 0);
+            const latestStart = new Date(closeTime.getTime() - durationMs);
+
+            // If this is today, start from now
+            const isToday = avail.date.toDateString() === now.toDateString();
+            let startFrom = isToday ? new Date(Math.max(now.getTime(), openTime.getTime())) : openTime;
+
+            // Round up to next 15-minute increment
+            const mins = startFrom.getUTCMinutes();
+            const roundedMins = Math.ceil(mins / 15) * 15;
+            startFrom = new Date(startFrom);
+            startFrom.setUTCMinutes(roundedMins, 0, 0);
+
+            for (
+                let candidate = new Date(startFrom);
+                candidate <= latestStart;
+                candidate = new Date(candidate.getTime() + 15 * 60_000)
+            ) {
+                const candidateEnd = candidate.getTime() + durationMs;
+
+                const hasConflict = appointments.some(apt => {
+                    const aptEnd = apt.startTime.getTime() + apt.durationMinutes * 60_000;
+                    return candidate.getTime() < aptEnd && apt.startTime.getTime() < candidateEnd;
+                });
+
+                if (!hasConflict) {
+                    res.status(200).json({
+                        success: true,
+                        data: {
+                            suggestedTime: candidate.toISOString(),
+                            durationMinutes,
+                        },
+                    });
+                    return;
+                }
+            }
+        }
+
+        throw new AppError(`No available slots found in the next ${scanDays} days`, 404);
     }
 }
 

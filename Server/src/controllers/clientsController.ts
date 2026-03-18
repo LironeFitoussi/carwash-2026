@@ -22,7 +22,7 @@ class ClientsController {
         }
         const clients = await Client.find({
             name: { $regex: name, $options: 'i' },
-        }).select('_id name').limit(10);
+        }).select('_id name carType').limit(10);
         res.status(200).json({ success: true, data: clients });
     }
 

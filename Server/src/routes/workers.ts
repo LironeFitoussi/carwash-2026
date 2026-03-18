@@ -10,6 +10,9 @@ router.use(auth0Middleware);
 
 router.get("/name/:name", asyncHandler(controller.getWorkerByName.bind(controller)));
 router.get("/:workerId/availability", asyncHandler(controller.getWorkerAvailability.bind(controller)));
+router.get("/:workerId/availability-dates", asyncHandler(controller.getAvailabilityDates.bind(controller)));
+router.post("/availability/assign", asyncHandler(controller.assignAvailability.bind(controller)));
+router.post("/availability/delete", asyncHandler(controller.deleteAvailability.bind(controller)));
 router.get("/", asyncHandler(controller.getWorkers.bind(controller)));
 router.get("/:id", asyncHandler(controller.getWorkerById.bind(controller)));
 router.post("/", asyncHandler(controller.createWorker.bind(controller)));

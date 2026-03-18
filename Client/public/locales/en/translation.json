@@ -15,7 +15,8 @@
     "dashboard": "Dashboard",
     "appointments": "Appointments",
     "clients": "Clients",
-    "workers": "Workers"
+    "workers": "Workers",
+    "settings": "Settings"
   },
   "common": {
     "loading": "Loading...",
@@ -88,8 +89,8 @@
     },
     "vehicle_types": {
       "small": "Small",
-      "5-seater": "5-Seater",
-      "7-seater": "7-Seater"
+      "regular": "Regular",
+      "big": "Big"
     },
     "service_types": {
       "basic": "Basic",
@@ -116,7 +117,10 @@
       "search_client": "Search client by name...",
       "select_worker": "Select a worker",
       "notes": "Notes",
-      "created": "Appointment created successfully"
+      "created": "Appointment created successfully",
+      "suggest_next": "Suggest Next",
+      "no_available_slots": "No available slots found",
+      "duration": "Duration"
     },
     "edit": {
       "title": "Edit Appointment",
@@ -141,7 +145,18 @@
     },
     "conflict": {
       "title": "Time Conflict",
-      "description": "This worker already has an appointment within 1 hour of the selected time."
+      "description": "This worker already has an appointment that overlaps with the selected time."
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "car_sizes": {
+      "title": "Car Size Settings",
+      "description": "Configure car sizes and their cleaning durations",
+      "duration": "Duration (minutes)",
+      "label_en": "Label (English)",
+      "label_he": "Label (Hebrew)",
+      "updated": "Car size config updated"
     }
   },
   "clients": {
@@ -211,6 +226,21 @@
       "interior-cleaning": "Interior Cleaning",
       "detailing": "Detailing",
       "polishing": "Polishing"
+    },
+    "schedule": {
+      "title": "Worker Schedules",
+      "description": "Set working days and hours for each worker",
+      "updated": "Schedule updated",
+      "day_off": "Day off",
+      "days": {
+        "0": "Sun",
+        "1": "Mon",
+        "2": "Tue",
+        "3": "Wed",
+        "4": "Thu",
+        "5": "Fri",
+        "6": "Sat"
+      }
     },
     "form": {
       "name": "Full Name",

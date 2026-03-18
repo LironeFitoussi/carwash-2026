@@ -1,9 +1,9 @@
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,8 +11,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { fetchWorkers } from '@/services/workers';
 import { searchClients } from '@/services/clients';
+import { getNextAvailable } from '@/services/appointments';
+import { getCarSizeConfigs } from '@/services/carSizeConfig';
 import useDebounce from '@/hooks/useDebounce';
-import type { CreateAppointmentInput } from '@/types';
+import type { CreateAppointmentInput, VehicleType, CarType } from '@/types';
 
 const appointmentFormSchema = z.object({
     clientId: z.string().min(1, 'Client is required'),
@@ -23,7 +25,7 @@ const appointmentFormSchema = z.object({
     notes: z.string().optional(),
     isPickedUp: z.boolean().default(false),
     pickupLocation: z.string().optional(),
-    vehicleType: z.enum(['small', '5-seater', '7-seater']).optional(),
+    vehicleType: z.enum(['small', 'regular', 'big']),
 });
 
 type AppointmentFormValues = z.infer<typeof appointmentFormSchema>;
@@ -34,12 +36,28 @@ interface AppointmentFormProps {
     isLoading?: boolean;
 }
 
+const CAR_TYPE_TO_VEHICLE: Record<CarType, VehicleType> = {
+    small: 'small',
+    medium: 'regular',
+    large: 'big',
+    motorcycle: 'small',
+};
+
+function formatDuration(minutes: number): string {
+    const h = Math.floor(minutes / 60);
+    const m = minutes % 60;
+    if (h === 0) return `${m}min`;
+    if (m === 0) return `${h}h`;
+    return `${h}h ${m}min`;
+}
+
 export default function AppointmentForm({ initialData, onSubmit, isLoading }: AppointmentFormProps) {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const [clientSearch, setClientSearch] = useState('');
     const debouncedSearch = useDebounce(clientSearch, 300);
+    const lang = i18n.language === 'he' ? 'he' : 'en';
 
-    const { register, handleSubmit, control, watch, formState: { errors } } = useForm<AppointmentFormValues>({
+    const { register, handleSubmit, control, watch, setValue, formState: { errors } } = useForm<AppointmentFormValues>({
         resolver: zodResolver(appointmentFormSchema),
         defaultValues: {
             clientId: '',
@@ -56,6 +74,8 @@ export default function AppointmentForm({ initialData, onSubmit, isLoading }: Ap
     });
 
     const isPickedUp = watch('isPickedUp');
+    const selectedWorkerId = watch('workerId');
+    const selectedVehicleType = watch('vehicleType');
 
     const { data: workers = [] } = useQuery({
         queryKey: ['workers'],
@@ -67,6 +87,33 @@ export default function AppointmentForm({ initialData, onSubmit, isLoading }: Ap
         queryFn: () => searchClients(debouncedSearch),
         enabled: debouncedSearch.length > 1,
     });
+
+    const { data: carSizeConfigs = [] } = useQuery({
+        queryKey: ['carSizeConfigs'],
+        queryFn: getCarSizeConfigs,
+    });
+
+    const suggestMutation = useMutation({
+        mutationFn: () => getNextAvailable(selectedWorkerId, selectedVehicleType),
+        onSuccess: (data) => {
+            // Convert ISO to datetime-local format
+            const date = new Date(data.suggestedTime);
+            const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+            const formatted = local.toISOString().slice(0, 16);
+            setValue('startTime', formatted);
+        },
+    });
+
+    const canSuggest = selectedWorkerId && selectedVehicleType;
+    const selectedConfig = carSizeConfigs.find(c => c.key === selectedVehicleType);
+
+    // Auto-map client carType to vehicleType when a client is selected
+    const [selectedClientCarType, setSelectedClientCarType] = useState<CarType | null>(null);
+    useEffect(() => {
+        if (selectedClientCarType && !initialData?.vehicleType) {
+            setValue('vehicleType', CAR_TYPE_TO_VEHICLE[selectedClientCarType]);
+        }
+    }, [selectedClientCarType, setValue, initialData?.vehicleType]);
 
     return (
         <form onSubmit={handleSubmit((data) => onSubmit(data as CreateAppointmentInput))} className="space-y-4">
@@ -87,13 +134,16 @@ export default function AppointmentForm({ initialData, onSubmit, isLoading }: Ap
                                 {clientResults.length === 0 ? (
                                     <p className="px-3 py-2 text-sm text-gray-500">{t('common.no_results')}</p>
                                 ) : (
-                                    clientResults.map((c) => (
+                                    clientResults.map((c: any) => (
                                         <button
                                             key={c._id}
                                             type="button"
                                             onClick={() => {
                                                 field.onChange(c._id);
                                                 setClientSearch(c.name);
+                                                if (c.carType) {
+                                                    setSelectedClientCarType(c.carType);
+                                                }
                                             }}
                                             className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-100 ${field.value === c._id ? 'bg-blue-50 text-blue-700' : ''}`}
                                         >
@@ -132,15 +182,61 @@ export default function AppointmentForm({ initialData, onSubmit, isLoading }: Ap
                 {errors.workerId && <p className="text-sm text-red-500 mt-1">{errors.workerId.message}</p>}
             </div>
 
-            {/* Start Time */}
+            {/* Vehicle Type (Car Size) */}
+            <div>
+                <Label>{t('appointments.form.vehicle_type')}</Label>
+                <Controller
+                    name="vehicleType"
+                    control={control}
+                    render={({ field }) => (
+                        <Select value={field.value ?? ''} onValueChange={field.onChange}>
+                            <SelectTrigger>
+                                <SelectValue placeholder={t('appointments.form.vehicle_type')} />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {carSizeConfigs.map((config) => (
+                                    <SelectItem key={config.key} value={config.key}>
+                                        {config.label[lang]} - {formatDuration(config.durationMinutes)}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    )}
+                />
+                {selectedConfig && (
+                    <p className="text-sm text-gray-500 mt-1">
+                        {t('appointments.form.duration')}: {formatDuration(selectedConfig.durationMinutes)}
+                    </p>
+                )}
+                {errors.vehicleType && <p className="text-sm text-red-500 mt-1">{errors.vehicleType.message}</p>}
+            </div>
+
+            {/* Start Time + Auto-suggest */}
             <div>
                 <Label>{t('appointments.form.start_time')}</Label>
-                <Input
-                    type="datetime-local"
-                    step={900}
-                    {...register('startTime')}
-                />
+                <div className="flex gap-2">
+                    <Input
+                        type="datetime-local"
+                        step={900}
+                        {...register('startTime')}
+                        className="flex-1"
+                    />
+                    {canSuggest && (
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => suggestMutation.mutate()}
+                            disabled={suggestMutation.isPending}
+                            className="whitespace-nowrap"
+                        >
+                            {suggestMutation.isPending ? '...' : t('appointments.form.suggest_next')}
+                        </Button>
+                    )}
+                </div>
                 {errors.startTime && <p className="text-sm text-red-500 mt-1">{errors.startTime.message}</p>}
+                {suggestMutation.isError && (
+                    <p className="text-sm text-red-500 mt-1">{t('appointments.form.no_available_slots')}</p>
+                )}
             </div>
 
             {/* Service Type */}
@@ -158,29 +254,6 @@ export default function AppointmentForm({ initialData, onSubmit, isLoading }: Ap
                                 {(['basic', 'premium', 'deluxe'] as const).map((type) => (
                                     <SelectItem key={type} value={type}>
                                         {t(`appointments.service_types.${type}`)}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    )}
-                />
-            </div>
-
-            {/* Vehicle Type */}
-            <div>
-                <Label>{t('appointments.form.vehicle_type')}</Label>
-                <Controller
-                    name="vehicleType"
-                    control={control}
-                    render={({ field }) => (
-                        <Select value={field.value ?? ''} onValueChange={(v) => field.onChange(v || undefined)}>
-                            <SelectTrigger>
-                                <SelectValue placeholder={t('common.optional')} />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {(['small', '5-seater', '7-seater'] as const).map((type) => (
-                                    <SelectItem key={type} value={type}>
-                                        {t(`appointments.vehicle_types.${type}`)}
                                     </SelectItem>
                                 ))}
                             </SelectContent>

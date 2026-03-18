@@ -9,7 +9,7 @@ export const createAppointmentSchema = z.object({
     notes: z.string().optional(),
     isPickedUp: z.boolean().optional().default(false),
     pickupLocation: z.string().optional(),
-    vehicleType: z.enum(['small', '5-seater', '7-seater']).optional(),
+    vehicleType: z.enum(['small', 'regular', 'big']),
 });
 
 export const updateAppointmentSchema = createAppointmentSchema.partial();

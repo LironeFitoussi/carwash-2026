@@ -1,5 +1,5 @@
 import api from './api';
-import type { IAppointment, AppointmentStatus, CreateAppointmentInput } from '@/types';
+import type { IAppointment, AppointmentStatus, CreateAppointmentInput, INextAvailable } from '@/types';
 
 export const getAppointments = async (): Promise<IAppointment[]> => {
     const { data } = await api.get('/api/appointments');
@@ -37,5 +37,12 @@ export const deleteAppointment = async (id: string): Promise<void> => {
 
 export const switchAppointmentStatus = async (id: string, status: AppointmentStatus): Promise<IAppointment> => {
     const { data } = await api.post(`/api/appointments/${id}/switch-status/${status}`);
+    return data.data;
+};
+
+export const getNextAvailable = async (workerId: string, carSize: string): Promise<INextAvailable> => {
+    const { data } = await api.get('/api/appointments/next-available', {
+        params: { workerId, carSize },
+    });
     return data.data;
 };

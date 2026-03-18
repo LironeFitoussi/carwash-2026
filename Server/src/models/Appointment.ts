@@ -20,17 +20,20 @@ const appointmentSchema = new Schema<IAppointmentDoc>({
     pickupLocation: { type: String },
     vehicleType: {
         type: String,
-        enum: ['small', '5-seater', '7-seater'],
+        enum: ['small', 'regular', 'big'],
+        required: true,
     },
+    durationMinutes: { type: Number, required: true },
 }, {
     timestamps: true,
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
 });
 
-appointmentSchema.methods.conflictsWith = function (startTime: Date): boolean {
-    const duration = 59 * 60 * 1000;
-    return Math.abs(this.startTime.getTime() - startTime.getTime()) < duration;
+appointmentSchema.methods.conflictsWith = function (startTime: Date, durationMinutes: number): boolean {
+    const thisEnd = this.startTime.getTime() + this.durationMinutes * 60_000;
+    const newEnd = startTime.getTime() + durationMinutes * 60_000;
+    return this.startTime.getTime() < newEnd && startTime.getTime() < thisEnd;
 };
 
 const AppointmentModel = mongoose.model<IAppointmentDoc, IAppointmentModel>('Appointment', appointmentSchema);

@@ -16,6 +16,8 @@ import dangerRoutes from "./routes/dangerRoutes.js";
 import clientRoutes from "./routes/clients.js";
 import workerRoutes from "./routes/workers.js";
 import appointmentRoutes from "./routes/appointments.js";
+import carSizeConfigRoutes from "./routes/carSizeConfig.js";
+import { seedCarSizeConfigs } from "./models/CarSizeConfig.js";
 
 // Config Middleware
 dotenv.config();
@@ -49,8 +51,8 @@ app.use(rateLimit({
 // Morgan 
 app.use(morgan("dev")); // dev is the format of the logs
 
-// Connect to database
-connectDB();
+// Connect to database and seed defaults
+connectDB().then(() => seedCarSizeConfigs()).catch(console.error);
 
 // Middleware
 app.use(express.json());
@@ -67,6 +69,7 @@ app.use("/danger", dangerRoutes);
 app.use("/api/clients", clientRoutes);
 app.use("/api/workers", workerRoutes);
 app.use("/api/appointments", appointmentRoutes);
+app.use("/api/car-size-config", carSizeConfigRoutes);
 
 // Error handling middleware (must be last)
 app.use(errorHandler);

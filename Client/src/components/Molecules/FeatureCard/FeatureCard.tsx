@@ -1,9 +1,9 @@
 import type { ComponentType } from "react";
 import type { SVGProps } from "react";
-import { Card } from "@/components/Atoms/Card";
-import { Icon } from "@/components/Atoms/Icon";
-import { Heading } from "@/components/Atoms/Heading";
-import { Text } from "@/components/Atoms/Text";
+import { Card } from "@/components/atoms/Card";
+import { Icon } from "@/components/atoms/Icon";
+import { Heading } from "@/components/atoms/Heading";
+import { Text } from "@/components/atoms/Text";
 import { cn } from "@/lib/utils";
 
 export interface FeatureCardProps {

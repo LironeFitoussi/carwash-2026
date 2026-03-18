@@ -1,0 +1,230 @@
+{
+  "app": { "title": "Car Wash Service" },
+  "auth": {
+    "login": "Sign In",
+    "signup": "Sign Up",
+    "email": "Email",
+    "password": "Password",
+    "logout": "Logout",
+    "google": "Continue with Google",
+    "subtitle": "Sign in to manage your car wash business",
+    "toggle_signin": "Already have an account? Sign In",
+    "toggle_signup": "Don't have an account? Sign Up"
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "appointments": "Appointments",
+    "clients": "Clients",
+    "workers": "Workers"
+  },
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "saving": "Saving...",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "deleting": "Deleting...",
+    "edit": "Edit",
+    "close": "Close",
+    "confirm": "Confirm",
+    "search": "Search",
+    "add": "Add",
+    "active": "Active",
+    "inactive": "Inactive",
+    "actions": "Actions",
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone",
+    "notes": "Notes",
+    "status": "Status",
+    "optional": "Optional",
+    "no_data": "No data found",
+    "no_results": "No results found",
+    "error": "Something went wrong",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "total_appointments": "Total Appointments",
+    "active_clients": "Active Clients",
+    "staff_members": "Staff Members",
+    "revenue": "Revenue",
+    "recent_appointments": "Recent Appointments",
+    "quick_stats": "Quick Stats",
+    "service_breakdown": "Service Breakdown"
+  },
+  "appointments": {
+    "title": "Appointments",
+    "subtitle": "Manage car wash appointments",
+    "add": "Add Appointment",
+    "all": "All Appointments",
+    "loading": "Loading appointments...",
+    "error": "Failed to load appointments",
+    "no_appointments": "No appointments found",
+    "calendar": {
+      "title": "Calendar",
+      "daily": "Daily",
+      "weekly": "Weekly",
+      "today": "Today",
+      "no_appointments": "No appointments"
+    },
+    "table": {
+      "client": "Client",
+      "worker": "Worker",
+      "start_time": "Start Time",
+      "service_type": "Service",
+      "vehicle_type": "Vehicle",
+      "status": "Status",
+      "actions": "Actions",
+      "add": "Add Appointment"
+    },
+    "status": {
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "update": "Update Status"
+    },
+    "vehicle_types": {
+      "small": "Small",
+      "5-seater": "5-Seater",
+      "7-seater": "7-Seater"
+    },
+    "service_types": {
+      "basic": "Basic",
+      "premium": "Premium",
+      "deluxe": "Deluxe"
+    },
+    "pickup": {
+      "service": "Pickup Service",
+      "label": "Pickup Service",
+      "location": "Pickup Location",
+      "location_placeholder": "Enter pickup address"
+    },
+    "form": {
+      "client": "Client",
+      "worker": "Worker",
+      "start_time": "Start Time",
+      "service_type": "Service Type",
+      "vehicle_type": "Vehicle Type",
+      "status": "Status",
+      "pickup": "Pickup Service",
+      "pickup_location": "Pickup Location",
+      "new_client": "New Client",
+      "existing_client": "Existing Client",
+      "search_client": "Search client by name...",
+      "select_worker": "Select a worker",
+      "notes": "Notes",
+      "created": "Appointment created successfully"
+    },
+    "edit": {
+      "title": "Edit Appointment",
+      "description": "Update appointment details",
+      "saving": "Saving..."
+    },
+    "delete": {
+      "title": "Delete Appointment",
+      "description": "Are you sure you want to delete this appointment? This action cannot be undone.",
+      "confirm": "Are you sure you want to delete the appointment for {{client}} on {{time}}?",
+      "deleting": "Deleting...",
+      "success": "Appointment deleted",
+      "error": "Failed to delete appointment"
+    },
+    "update": {
+      "success": "Appointment updated",
+      "error": "Failed to update appointment"
+    },
+    "details": {
+      "title": "Appointment Details",
+      "description": "View appointment information"
+    },
+    "conflict": {
+      "title": "Time Conflict",
+      "description": "This worker already has an appointment within 1 hour of the selected time."
+    }
+  },
+  "clients": {
+    "title": "Clients",
+    "add": "Add Client",
+    "edit": "Edit Client",
+    "updated": "Client updated successfully",
+    "all": "All Clients",
+    "loading": "Loading clients...",
+    "error": "Failed to load clients",
+    "no_clients": "No clients found",
+    "car_type": "Car Type",
+    "car_types": {
+      "small": "Small",
+      "medium": "Medium",
+      "large": "Large",
+      "motorcycle": "Motorcycle"
+    },
+    "contact": "Contact",
+    "inactive": "inactive",
+    "call": "Call",
+    "sms": "SMS",
+    "whatsapp": "WhatsApp",
+    "created": "Client created successfully",
+    "deleted": "Client deleted",
+    "create_error": "Failed to create client",
+    "details": {
+      "title": "Client Details",
+      "appointments": "Appointment History",
+      "no_appointments": "No appointments yet"
+    },
+    "form": {
+      "title": "Client Information",
+      "name": "Full Name",
+      "email": "Email Address",
+      "phone": "Phone Number",
+      "car_type": "Car Type",
+      "notes": "Notes",
+      "active": "Active Client"
+    },
+    "delete": {
+      "title": "Delete Client",
+      "confirm": "Are you sure you want to delete {{name}}?",
+      "description": "Are you sure you want to delete this client?",
+      "success": "Client deleted",
+      "error": "Failed to delete client"
+    }
+  },
+  "workers": {
+    "title": "Workers",
+    "add": "Add Worker",
+    "all": "All Workers",
+    "loading": "Loading workers...",
+    "error": "Failed to load workers",
+    "no_workers": "No workers found",
+    "specialties": "Specialties",
+    "created": "Worker created successfully",
+    "deleted": "Worker deleted",
+    "specialty_options": {
+      "exterior-wash": "Exterior Wash",
+      "interior-cleaning": "Interior Cleaning",
+      "detailing": "Detailing",
+      "polishing": "Polishing"
+    },
+    "specialties": {
+      "exterior-wash": "Exterior Wash",
+      "interior-cleaning": "Interior Cleaning",
+      "detailing": "Detailing",
+      "polishing": "Polishing"
+    },
+    "form": {
+      "name": "Full Name",
+      "email": "Email Address",
+      "phone": "Phone Number",
+      "specialties": "Specialties",
+      "active": "Active Worker"
+    },
+    "delete": {
+      "title": "Delete Worker",
+      "confirm": "Are you sure you want to delete {{name}}?",
+      "description": "Are you sure you want to delete this worker?",
+      "success": "Worker deleted",
+      "error": "Failed to delete worker"
+    }
+  }
+}

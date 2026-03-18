@@ -3,7 +3,7 @@ services:
     build:
       context: .
       target: development
-    container_name: mern-server
+    container_name: carwash-server
     restart: unless-stopped
     env_file: .env
     ports:

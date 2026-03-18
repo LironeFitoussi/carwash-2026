@@ -23,7 +23,7 @@ export const fetchUser = createAsyncThunk(
   'user/fetchUser',
   async (payload: Auth0Payload, { rejectWithValue }) => {
     try {
-      const response = await getCurrentUser(payload.token!);
+      const response = await getCurrentUser();
       return response.data;
     } catch (error: unknown) {
       const axiosError = error as AxiosError<{ error?: string; message?: string }>;
@@ -45,11 +45,12 @@ export const fetchUser = createAsyncThunk(
          });
          
          // refetch user after creation to get complete user data
-         const fetchResponse = await getCurrentUser(userData.email);
+         const fetchResponse = await getCurrentUser();
 
          return fetchResponse.data;
-       } catch (error) {
-        return rejectWithValue(error as string);
+       } catch (err: unknown) {
+        const e = err as AxiosError<{ message?: string }>;
+        return rejectWithValue(e?.response?.data?.message || 'Failed to create user');
        }
       }
       return rejectWithValue(axiosError?.response?.data?.message || 'Failed to fetch user');

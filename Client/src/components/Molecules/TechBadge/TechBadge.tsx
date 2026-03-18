@@ -1,6 +1,6 @@
 import type { ComponentType } from "react";
 import type { SVGProps } from "react";
-import { Icon } from "@/components/Atoms/Icon";
+import { Icon } from "@/components/atoms/Icon";
 import { cn } from "@/lib/utils";
 
 export interface TechBadgeProps {

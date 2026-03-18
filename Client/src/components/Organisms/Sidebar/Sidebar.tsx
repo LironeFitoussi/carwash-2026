@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useAppSelector } from "@/redux/hooks";
 import { getSidebarMenuItems, routeConfig } from "@/config/routesConfig";
 import type { SidebarMenuItem, SidebarSubMenuItem } from "@/config/routesConfig";
-import { MenuItem } from "@/components/Molecules/MenuItem";
+import { MenuItem } from "@/components/molecules/MenuItem";
 
 export interface SidebarProps {
   appName?: string;

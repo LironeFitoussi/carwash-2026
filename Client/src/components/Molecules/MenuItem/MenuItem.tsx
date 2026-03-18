@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { Link } from "react-router";
 import { ChevronDown, ChevronRight } from "lucide-react";
-import { Icon } from "@/components/Atoms/Icon";
+import { Icon } from "@/components/atoms/Icon";
 import { cn } from "@/lib/utils";
 
 export interface MenuItemProps {

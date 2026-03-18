@@ -1,4 +1,4 @@
-import { Text } from "@/components/Atoms/Text";
+import { Text } from "@/components/atoms/Text";
 import { cn } from "@/lib/utils";
 
 export interface FooterProps {

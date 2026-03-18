@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
-import { Heading } from "@/components/Atoms/Heading";
-import { Text } from "@/components/Atoms/Text";
+import { Heading } from "@/components/atoms/Heading";
+import { Text } from "@/components/atoms/Text";
 import { cn } from "@/lib/utils";
 
 export interface SectionProps {

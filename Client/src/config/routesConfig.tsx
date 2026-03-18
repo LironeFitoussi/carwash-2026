@@ -1,16 +1,15 @@
 import type { ComponentType, ReactNode } from "react";
-import { Home, User, LayoutDashboard, Settings } from "lucide-react";
+import { Calendar, Users, UserCheck, LayoutDashboard } from "lucide-react";
 import type { SVGProps } from "react";
-import HomePage, { HomePageLoader } from "../pages/HomePage";
-import ProfilePage from "../pages/ProfilePage";
-import ProfileSettingsPage from "../pages/ProfileSettingsPage";
-import ProfilePreferencesPage from "../pages/ProfilePreferencesPage";
-import DashboardPage from "../pages/DashboardPage";
-import DashboardAnalyticsPage from "../pages/DashboardAnalyticsPage";
-import DashboardReportsPage from "../pages/DashboardReportsPage";
-import GeneralSettingsPage from "../pages/GeneralSettingsPage";
-import SecuritySettingsPage from "../pages/SecuritySettingsPage";
-import NotificationsSettingsPage from "../pages/NotificationsSettingsPage";
+
+import Auth from "../pages/Auth";
+import Dashboard from "../pages/Dashboard";
+import Appointments from "../pages/Appointments";
+import AddAppointment from "../pages/AddAppointment";
+import Clients from "../pages/Clients";
+import NewClient from "../pages/NewClient";
+import Workers from "../pages/Workers";
+import AddWorker from "../pages/AddWorker";
 
 // Type for Lucide icons
 export type LucideIcon = ComponentType<SVGProps<SVGSVGElement>>;
@@ -40,93 +39,81 @@ export interface RouteConfig {
 // Define all routes in one place
 export const routeConfig: RouteConfig[] = [
   {
-    path: "/",
-    name: "Home",
-    Component: HomePage,
-    loader: HomePageLoader,
-    icon: Home,
-    showInSidebar: true,
-    index: true,
-  },
-  {
-    path: "/profile",
-    name: "Profile",
-    icon: User,
-    showInSidebar: true,
-    requireAuth: true,
-    children: [
-      {
-        path: "/profile",
-        name: "View Profile",
-        Component: ProfilePage,
-        showInSidebar: true,
-        index: true,
-      },
-      {
-        path: "settings",
-        name: "Settings",
-        Component: ProfileSettingsPage,
-        showInSidebar: true,
-      },
-      {
-        path: "preferences",
-        name: "Preferences",
-        Component: ProfilePreferencesPage,
-        showInSidebar: true,
-      },
-    ],
+    path: "/auth",
+    name: "Auth",
+    Component: Auth,
+    showInSidebar: false,
   },
   {
     path: "/dashboard",
     name: "Dashboard",
+    Component: Dashboard,
     icon: LayoutDashboard,
+    showInSidebar: true,
+    requireAuth: true,
+  },
+  {
+    path: "/appointments",
+    name: "Appointments",
+    icon: Calendar,
     showInSidebar: true,
     requireAuth: true,
     children: [
       {
-        path: "/dashboard",
-        name: "Overview",
-        Component: DashboardPage,
+        path: "/appointments",
+        name: "All Appointments",
+        Component: Appointments,
         showInSidebar: true,
         index: true,
       },
       {
-        path: "analytics",
-        name: "Analytics",
-        Component: DashboardAnalyticsPage,
-        showInSidebar: true,
-      },
-      {
-        path: "reports",
-        name: "Reports",
-        Component: DashboardReportsPage,
+        path: "new",
+        name: "Add Appointment",
+        Component: AddAppointment,
         showInSidebar: true,
       },
     ],
   },
   {
-    path: "/settings",
-    name: "Settings",
-    icon: Settings,
+    path: "/clients",
+    name: "Clients",
+    icon: Users,
     showInSidebar: true,
     requireAuth: true,
     children: [
       {
-        path: "general",
-        name: "General",
-        Component: GeneralSettingsPage,
+        path: "/clients",
+        name: "All Clients",
+        Component: Clients,
         showInSidebar: true,
+        index: true,
       },
       {
-        path: "security",
-        name: "Security",
-        Component: SecuritySettingsPage,
+        path: "new",
+        name: "New Client",
+        Component: NewClient,
         showInSidebar: true,
       },
+    ],
+  },
+  {
+    path: "/workers",
+    name: "Workers",
+    icon: UserCheck,
+    showInSidebar: true,
+    requireAuth: true,
+    children: [
       {
-        path: "notifications",
-        name: "Notifications",
-        Component: NotificationsSettingsPage,
+        path: "/workers",
+        name: "All Workers",
+        Component: Workers,
+        showInSidebar: true,
+        index: true,
+      },
+      {
+        path: "new",
+        name: "Add Worker",
+        Component: AddWorker,
         showInSidebar: true,
       },
     ],
@@ -142,8 +129,8 @@ export function convertToRouterRoutes(config: RouteConfig[]): RouteObject[] {
         index: true as const,
         Component: route.Component,
         loader: route.loader,
-        children: route.children && route.children.length > 0 
-          ? convertToRouterRoutes(route.children) 
+        children: route.children && route.children.length > 0
+          ? convertToRouterRoutes(route.children)
           : undefined,
       } as RouteObject;
     }
@@ -152,8 +139,8 @@ export function convertToRouterRoutes(config: RouteConfig[]): RouteObject[] {
       path: route.path,
       Component: route.Component,
       loader: route.loader,
-      children: route.children && route.children.length > 0 
-        ? convertToRouterRoutes(route.children) 
+      children: route.children && route.children.length > 0
+        ? convertToRouterRoutes(route.children)
         : undefined,
     } as RouteObject;
   });
@@ -178,11 +165,9 @@ export interface SidebarSubMenuItem {
 
 // Helper function to resolve full path for nested routes
 function resolvePath(childPath: string, parentPath: string): string {
-  // If child path is already absolute, return it
   if (childPath.startsWith("/")) {
     return childPath;
   }
-  // Otherwise, combine with parent path
   const parentBase = parentPath.endsWith("/") ? parentPath.slice(0, -1) : parentPath;
   return `${parentBase}/${childPath}`;
 }
@@ -195,16 +180,12 @@ export function getSidebarMenuItems(
   const menuItems: SidebarMenuItem[] = [];
 
   config.forEach((route) => {
-    // Skip routes that shouldn't be shown in sidebar
     if (!route.showInSidebar) return;
-
-    // Check authentication requirements
     if (route.requireAuth && !isAuthenticated) return;
     if (route.requiredRole && userRole !== route.requiredRole) return;
 
-    // If route has children that should be shown in sidebar, create a menu item with sub-menus
     const sidebarChildren = route.children?.filter((child) => child.showInSidebar);
-    
+
     if (sidebarChildren && sidebarChildren.length > 0) {
       const subMenus: SidebarSubMenuItem[] = sidebarChildren
         .filter((child) => {
@@ -213,7 +194,6 @@ export function getSidebarMenuItems(
           return true;
         })
         .map((child) => {
-          // For index routes, use the parent path
           let childPath = child.path;
           if (child.index) {
             childPath = route.path;
@@ -230,14 +210,13 @@ export function getSidebarMenuItems(
 
       menuItems.push({
         label: route.name,
-        path: route.Component ? route.path : undefined, // Only set path if it has a component
+        path: route.Component ? route.path : undefined,
         icon: route.icon ? <route.icon className="w-5 h-5" /> : undefined,
         subMenus: subMenus.length > 0 ? subMenus : undefined,
         requireAuth: route.requireAuth,
         requiredRole: route.requiredRole,
       });
     } else if (route.Component) {
-      // Single menu item without sub-menus
       menuItems.push({
         label: route.name,
         path: route.path,
@@ -250,4 +229,3 @@ export function getSidebarMenuItems(
 
   return menuItems;
 }
-

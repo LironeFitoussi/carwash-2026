@@ -1,0 +1,229 @@
+{
+  "app": { "title": "שירות רחיצת רכב" },
+  "auth": {
+    "login": "התחבר",
+    "signup": "הירשם",
+    "email": "אימייל",
+    "password": "סיסמה",
+    "logout": "התנתק",
+    "google": "המשך עם Google",
+    "subtitle": "התחבר לניהול עסק רחיצת הרכב שלך",
+    "toggle_signin": "יש לך חשבון? התחבר",
+    "toggle_signup": "אין לך חשבון? הירשם"
+  },
+  "navigation": {
+    "dashboard": "לוח בקרה",
+    "appointments": "תורים",
+    "clients": "לקוחות",
+    "workers": "עובדים"
+  },
+  "common": {
+    "loading": "טוען...",
+    "save": "שמור",
+    "saving": "שומר...",
+    "cancel": "ביטול",
+    "delete": "מחק",
+    "deleting": "מוחק...",
+    "edit": "ערוך",
+    "close": "סגור",
+    "confirm": "אשר",
+    "search": "חיפוש",
+    "add": "הוסף",
+    "active": "פעיל",
+    "inactive": "לא פעיל",
+    "actions": "פעולות",
+    "name": "שם",
+    "email": "אימייל",
+    "phone": "טלפון",
+    "notes": "הערות",
+    "status": "סטטוס",
+    "optional": "אופציונלי",
+    "no_data": "לא נמצאו נתונים",
+    "no_results": "לא נמצאו תוצאות",
+    "error": "משהו השתבש",
+    "yes": "כן",
+    "no": "לא"
+  },
+  "dashboard": {
+    "title": "לוח בקרה",
+    "total_appointments": "סה\"כ תורים",
+    "active_clients": "לקוחות פעילים",
+    "staff_members": "עובדים",
+    "revenue": "הכנסות",
+    "recent_appointments": "תורים אחרונים",
+    "quick_stats": "סטטיסטיקות מהירות",
+    "service_breakdown": "פירוט שירותים"
+  },
+  "appointments": {
+    "title": "תורים",
+    "subtitle": "ניהול תורי רחיצת רכב",
+    "add": "הוסף תור",
+    "all": "כל התורים",
+    "loading": "טוען תורים...",
+    "error": "שגיאה בטעינת תורים",
+    "no_appointments": "לא נמצאו תורים",
+    "calendar": {
+      "title": "לוח שנה",
+      "daily": "יומי",
+      "weekly": "שבועי",
+      "today": "היום",
+      "no_appointments": "אין תורים"
+    },
+    "table": {
+      "client": "לקוח",
+      "worker": "עובד",
+      "start_time": "שעת התחלה",
+      "service_type": "שירות",
+      "vehicle_type": "רכב",
+      "status": "סטטוס",
+      "actions": "פעולות",
+      "add": "הוסף תור"
+    },
+    "status": {
+      "pending": "ממתין",
+      "confirmed": "מאושר",
+      "completed": "הושלם",
+      "cancelled": "בוטל",
+      "update": "עדכן סטטוס"
+    },
+    "vehicle_types": {
+      "small": "קטן",
+      "5-seater": "5 מושבים",
+      "7-seater": "7 מושבים"
+    },
+    "service_types": {
+      "basic": "בסיסי",
+      "premium": "פרמיום",
+      "deluxe": "דלוקס"
+    },
+    "pickup": {
+      "service": "שירות איסוף",
+      "label": "שירות איסוף",
+      "location": "מיקום איסוף",
+      "location_placeholder": "הזן כתובת לאיסוף"
+    },
+    "form": {
+      "client": "לקוח",
+      "worker": "עובד",
+      "start_time": "שעת התחלה",
+      "service_type": "סוג שירות",
+      "vehicle_type": "סוג רכב",
+      "status": "סטטוס",
+      "pickup": "שירות איסוף",
+      "pickup_location": "מיקום איסוף",
+      "new_client": "לקוח חדש",
+      "existing_client": "לקוח קיים",
+      "search_client": "חפש לקוח לפי שם...",
+      "select_worker": "בחר עובד",
+      "notes": "הערות",
+      "created": "התור נוצר בהצלחה"
+    },
+    "edit": {
+      "title": "עריכת תור",
+      "description": "עדכן פרטי תור",
+      "saving": "שומר..."
+    },
+    "delete": {
+      "title": "מחיקת תור",
+      "confirm": "האם אתה בטוח שברצונך למחוק את התור של {{client}} ב-{{time}}?",
+      "description": "האם אתה בטוח שברצונך למחוק את התור הזה? לא ניתן לבטל פעולה זו.",
+      "deleting": "מוחק...",
+      "success": "התור נמחק",
+      "error": "שגיאה במחיקת התור"
+    },
+    "update": {
+      "success": "התור עודכן",
+      "error": "שגיאה בעדכון התור"
+    },
+    "details": {
+      "title": "פרטי תור",
+      "description": "צפה בפרטי התור"
+    },
+    "conflict": {
+      "title": "התנגשות בזמן",
+      "description": "לעובד זה כבר יש תור בטווח של שעה מהזמן שנבחר."
+    }
+  },
+  "clients": {
+    "title": "לקוחות",
+    "add": "הוסף לקוח",
+    "edit": "ערוך לקוח",
+    "updated": "הלקוח עודכן בהצלחה",
+    "all": "כל הלקוחות",
+    "loading": "טוען לקוחות...",
+    "error": "שגיאה בטעינת לקוחות",
+    "no_clients": "לא נמצאו לקוחות",
+    "car_type": "סוג רכב",
+    "car_types": {
+      "small": "קטן",
+      "medium": "בינוני",
+      "large": "גדול",
+      "motorcycle": "אופנוע"
+    },
+    "contact": "יצירת קשר",
+    "inactive": "לא פעיל",
+    "call": "התקשר",
+    "sms": "SMS",
+    "whatsapp": "WhatsApp",
+    "created": "הלקוח נוצר בהצלחה",
+    "deleted": "הלקוח נמחק",
+    "create_error": "שגיאה ביצירת הלקוח",
+    "details": {
+      "title": "פרטי לקוח",
+      "appointments": "היסטוריית תורים",
+      "no_appointments": "אין תורים עדיין"
+    },
+    "form": {
+      "title": "פרטי לקוח",
+      "name": "שם מלא",
+      "email": "כתובת אימייל",
+      "phone": "מספר טלפון",
+      "car_type": "סוג רכב",
+      "notes": "הערות",
+      "active": "לקוח פעיל"
+    },
+    "delete": {
+      "title": "מחיקת לקוח",
+      "confirm": "האם אתה בטוח שברצונך למחוק את {{name}}?",
+      "description": "האם אתה בטוח שברצונך למחוק את הלקוח?",
+      "success": "הלקוח נמחק",
+      "error": "שגיאה במחיקת הלקוח"
+    }
+  },
+  "workers": {
+    "title": "עובדים",
+    "add": "הוסף עובד",
+    "all": "כל העובדים",
+    "loading": "טוען עובדים...",
+    "error": "שגיאה בטעינת עובדים",
+    "no_workers": "לא נמצאו עובדים",
+    "created": "העובד נוצר בהצלחה",
+    "deleted": "העובד נמחק",
+    "specialty_options": {
+      "exterior-wash": "רחיצה חיצונית",
+      "interior-cleaning": "ניקוי פנימי",
+      "detailing": "דיטיילינג",
+      "polishing": "פוליש"
+    },
+    "specialties": {
+      "exterior-wash": "רחיצה חיצונית",
+      "interior-cleaning": "ניקוי פנימי",
+      "detailing": "דיטיילינג",
+      "polishing": "פוליש"
+    },
+    "form": {
+      "name": "שם מלא",
+      "email": "כתובת אימייל",
+      "phone": "מספר טלפון",
+      "specialties": "התמחויות",
+      "active": "עובד פעיל"
+    },
+    "delete": {
+      "title": "מחיקת עובד",
+      "confirm": "האם אתה בטוח שברצונך למחוק את {{name}}?",
+      "description": "האם אתה בטוח שברצונך למחוק את העובד?",
+      "success": "העובד נמחק",
+      "error": "שגיאה במחיקת העובד"
+    }
+  }
+}

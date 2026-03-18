@@ -1,6 +1,6 @@
 import { CheckCircle2 } from "lucide-react";
-import { Icon } from "@/components/Atoms/Icon";
-import { Text } from "@/components/Atoms/Text";
+import { Icon } from "@/components/atoms/Icon";
+import { Text } from "@/components/atoms/Text";
 import { cn } from "@/lib/utils";
 
 export interface BenefitItemProps {

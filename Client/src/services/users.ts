@@ -3,20 +3,16 @@ import api from "./api";
 
 
 export const getUsers = async () => {
-    const {data} = await api.get("/users");
+    const {data} = await api.get("/api/users");
     return data.data;
 };
 
-export const getCurrentUser = async (payload: string) => {
-    const {data} = await api.get(`/auth/me`, {
-        headers: {
-            Authorization: `Bearer ${payload}`,
-        },
-    });
+export const getCurrentUser = async () => {
+    const {data} = await api.get(`/api/auth/me`);
     return data;
 };
 
 export const createUser = async (payload: IUser) => {
-    const {data} = await api.post("/users", payload );
+    const {data} = await api.post("/api/users", payload);
     return data;
 };

@@ -1,24 +1,34 @@
+import './i18n';
+import i18n from 'i18next';
+
 import { createBrowserRouter, RouterProvider } from "react-router";
-
 import { Auth0Provider } from "@auth0/auth0-react";
-import { Provider } from 'react-redux'
-
-import {
-  QueryClient,
-  QueryClientProvider,
-} from '@tanstack/react-query'
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { Toaster } from 'react-hot-toast'
-
+import { Provider } from 'react-redux';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { Toaster } from 'sonner';
 import { createRoot } from "react-dom/client";
+
 import "./index.css";
 import { routes } from "./routes";
 import { store } from "./redux/store";
 import AppInitializer from "./components/AppInitializer";
 
-const router = createBrowserRouter(routes);
+// RTL support
+i18n.on('languageChanged', (lng) => {
+  document.documentElement.dir = lng === 'he' ? 'rtl' : 'ltr';
+  document.documentElement.lang = lng;
+});
 
-const queryClient = new QueryClient();
+const router = createBrowserRouter(routes);
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5,
+      gcTime: 1000 * 60 * 30,
+    },
+  },
+});
 
 createRoot(document.getElementById("root")!).render(
   <Provider store={store}>
@@ -36,30 +46,7 @@ createRoot(document.getElementById("root")!).render(
           <RouterProvider router={router} />
         </AppInitializer>
         <ReactQueryDevtools initialIsOpen={false} />
-        <Toaster 
-          position="top-right"
-          toastOptions={{
-            duration: 4000,
-            style: {
-              background: '#363636',
-              color: '#fff',
-            },
-            success: {
-              duration: 3000,
-              iconTheme: {
-                primary: '#4ade80',
-                secondary: '#fff',
-              },
-            },
-            error: {
-              duration: 5000,
-              iconTheme: {
-                primary: '#ef4444',
-                secondary: '#fff',
-              },
-            },
-          }}
-        />
+        <Toaster position="top-right" richColors />
       </QueryClientProvider>
     </Auth0Provider>
   </Provider>

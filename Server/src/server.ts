@@ -13,6 +13,9 @@ import { errorHandler } from "./utils/errorHandler.js";
 import userRoutes from "./routes/userRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import dangerRoutes from "./routes/dangerRoutes.js";
+import clientRoutes from "./routes/clients.js";
+import workerRoutes from "./routes/workers.js";
+import appointmentRoutes from "./routes/appointments.js";
 
 // Config Middleware
 dotenv.config();
@@ -61,6 +64,9 @@ app.get("/health", (req, res) => {
 app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/danger", dangerRoutes);
+app.use("/api/clients", clientRoutes);
+app.use("/api/workers", workerRoutes);
+app.use("/api/appointments", appointmentRoutes);
 
 // Error handling middleware (must be last)
 app.use(errorHandler);

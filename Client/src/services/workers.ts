@@ -1,5 +1,5 @@
 import api from './api';
-import type { IWorker, IWorkerAvailability, CreateWorkerInput, WeeklySchedule } from '@/types';
+import type { IWorker, IWorkerAvailability, CreateWorkerInput, IWorkerAvailabilityDate, AssignAvailabilityInput } from '@/types';
 
 export const fetchWorkers = async (): Promise<IWorker[]> => {
     const { data } = await api.get('/api/workers');
@@ -23,6 +23,23 @@ export const getWorkerAvailability = async (workerId: string, date: string, carS
     return data.data;
 };
 
+export const getWorkerAvailabilityDates = async (workerId: string, month: number, year: number): Promise<IWorkerAvailabilityDate[]> => {
+    const { data } = await api.get(`/api/workers/${workerId}/availability-dates`, {
+        params: { month, year },
+    });
+    return data.data;
+};
+
+export const assignAvailability = async (payload: AssignAvailabilityInput): Promise<{ count: number }> => {
+    const { data } = await api.post('/api/workers/availability/assign', payload);
+    return data.data;
+};
+
+export const deleteAvailability = async (workerId: string, dates: string[]): Promise<{ deletedCount: number }> => {
+    const { data } = await api.post('/api/workers/availability/delete', { workerId, dates });
+    return data.data;
+};
+
 export const createWorker = async (payload: CreateWorkerInput): Promise<IWorker> => {
     const { data } = await api.post('/api/workers', payload);
     return data.data;
@@ -30,11 +47,6 @@ export const createWorker = async (payload: CreateWorkerInput): Promise<IWorker>
 
 export const updateWorker = async (id: string, payload: Partial<CreateWorkerInput>): Promise<IWorker> => {
     const { data } = await api.put(`/api/workers/${id}`, payload);
-    return data.data;
-};
-
-export const updateWorkerSchedule = async (id: string, schedule: WeeklySchedule): Promise<IWorker> => {
-    const { data } = await api.put(`/api/workers/${id}/schedule`, schedule);
     return data.data;
 };
 

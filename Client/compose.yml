@@ -6,6 +6,8 @@ services:
     container_name: carwash-client
     restart: unless-stopped
     env_file: .env
+    environment:
+      - VITE_API_TARGET=http://server:3000
     ports:
       - "5173:5173"
     volumes:

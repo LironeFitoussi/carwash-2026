@@ -196,7 +196,7 @@ export default function AppointmentForm({ initialData, onSubmit, isLoading }: Ap
                             <SelectContent>
                                 {carSizeConfigs.map((config) => (
                                     <SelectItem key={config.key} value={config.key}>
-                                        {config.label[lang]} - {formatDuration(config.durationMinutes)}
+                                        <span dir="ltr">{config.label[lang]} ({formatDuration(config.durationMinutes)})</span>
                                     </SelectItem>
                                 ))}
                             </SelectContent>

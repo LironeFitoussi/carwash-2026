@@ -15,14 +15,6 @@ export interface IClient {
     updatedAt: string;
 }
 
-export interface IDaySchedule {
-    isWorking: boolean;
-    startTime: string; // "HH:mm"
-    endTime: string;   // "HH:mm"
-}
-
-export type WeeklySchedule = Record<string, IDaySchedule>;
-
 export interface IWorker {
     _id: string;
     name: string;
@@ -30,9 +22,24 @@ export interface IWorker {
     phone?: string;
     specialties: string[];
     isActive: boolean;
-    weeklySchedule: WeeklySchedule;
     createdAt: string;
     updatedAt: string;
+}
+
+export interface IWorkerAvailabilityDate {
+    _id: string;
+    workerId: string;
+    date: string;      // ISO date
+    startTime: string;  // "HH:mm"
+    endTime: string;    // "HH:mm"
+}
+
+export interface AssignAvailabilityInput {
+    workerId: string;
+    startDate: string;  // "YYYY-MM-DD"
+    endDate: string;    // "YYYY-MM-DD"
+    startTime: string;  // "HH:mm"
+    endTime: string;    // "HH:mm"
 }
 
 export interface IAppointment {

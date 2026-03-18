@@ -11,7 +11,7 @@ export const asyncHandler = (fn: Function) => {
 
 // Enhanced error handler middleware
 export const errorHandler = (error: any, req: Request, res: Response, next: NextFunction) => {
-  // console.error('Error:', error);
+  console.error('Error:', error);
   
   // Handle different types of errors
   error = handleMongooseError(error);

@@ -6,6 +6,7 @@
  * This script:
  * 1. Seeds the CarSizeConfig collection with defaults
  * 2. Migrates existing appointments: vehicleType enum + adds durationMinutes
+ * 3. Removes legacy weeklySchedule field from workers
  */
 
 import mongoose from 'mongoose';
@@ -61,7 +62,6 @@ async function migrate() {
     }
 
     // Set durationMinutes on all appointments that don't have it yet
-    // Existing appointments keep 59 min (their original booking duration)
     const noDuration = await appointments.updateMany(
         { durationMinutes: { $exists: false } },
         { $set: { durationMinutes: 59 } }
@@ -79,23 +79,14 @@ async function migrate() {
         console.log(`Set vehicleType='regular' on ${noVehicleType.modifiedCount} appointments with no vehicleType`);
     }
 
-    // 3. Add default weekly schedule to workers that don't have one
+    // 3. Remove legacy weeklySchedule from workers
     const workers = db.collection('workers');
-    const defaultSchedule = {
-        '0': { isWorking: true, startTime: '08:30', endTime: '17:00' },
-        '1': { isWorking: true, startTime: '08:30', endTime: '17:00' },
-        '2': { isWorking: true, startTime: '08:30', endTime: '17:00' },
-        '3': { isWorking: true, startTime: '08:30', endTime: '17:00' },
-        '4': { isWorking: true, startTime: '08:30', endTime: '17:00' },
-        '5': { isWorking: false, startTime: '08:30', endTime: '17:00' },
-        '6': { isWorking: false, startTime: '08:30', endTime: '17:00' },
-    };
-    const noSchedule = await workers.updateMany(
-        { weeklySchedule: { $exists: false } },
-        { $set: { weeklySchedule: defaultSchedule } }
+    const removedSchedule = await workers.updateMany(
+        { weeklySchedule: { $exists: true } },
+        { $unset: { weeklySchedule: '' } }
     );
-    if (noSchedule.modifiedCount > 0) {
-        console.log(`Added default schedule to ${noSchedule.modifiedCount} workers`);
+    if (removedSchedule.modifiedCount > 0) {
+        console.log(`Removed legacy weeklySchedule from ${removedSchedule.modifiedCount} workers`);
     }
 
     console.log('Migration complete!');

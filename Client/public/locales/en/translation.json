@@ -228,19 +228,21 @@
       "polishing": "Polishing"
     },
     "schedule": {
-      "title": "Worker Schedules",
-      "description": "Set working days and hours for each worker",
-      "updated": "Schedule updated",
-      "day_off": "Day off",
-      "days": {
-        "0": "Sun",
-        "1": "Mon",
-        "2": "Tue",
-        "3": "Wed",
-        "4": "Thu",
-        "5": "Fri",
-        "6": "Sat"
-      }
+      "title": "Worker Availability",
+      "description": "Assign working dates and hours for each worker",
+      "assign_range": "Assign date range",
+      "start_date": "Start Date",
+      "end_date": "End Date",
+      "start_time": "Start Time",
+      "end_time": "End Time",
+      "assign": "Assign Dates",
+      "assigned": "Assigned {{count}} days",
+      "deleted": "Availability removed",
+      "no_dates": "No dates assigned for this month",
+      "remove_day": "Mark day as non-working",
+      "mark_off": "Remove Day",
+      "day_removed": "Day marked as non-working",
+      "date": "Date"
     },
     "form": {
       "name": "Full Name",

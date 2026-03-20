@@ -5,6 +5,7 @@ import WorkerAvailability from "../models/WorkerAvailability.js";
 import { createWorkerSchema, updateWorkerSchema, assignAvailabilitySchema, deleteAvailabilitySchema } from "../zod/workersZod.js";
 import { AppError } from "../utils/errorHandler.js";
 import { getDurationMinutes } from "../utils/carSizeDuration.js";
+import { israelTimeToUTC } from "../utils/timezone.js";
 import type { CarSize } from "../types/index";
 
 function parseTime(timeStr: string): { hours: number; minutes: number } {
@@ -175,14 +176,9 @@ class WorkersController {
             startTime: { $gte: dayStart, $lte: dayEnd },
         }).sort({ startTime: 1 });
 
-        const openParsed = parseTime(availability.startTime);
-        const closeParsed = parseTime(availability.endTime);
-
-        const openTime = new Date(dayStart);
-        openTime.setUTCHours(openParsed.hours, openParsed.minutes, 0, 0);
-
-        const closeTime = new Date(dayStart);
-        closeTime.setUTCHours(closeParsed.hours, closeParsed.minutes, 0, 0);
+        // Convert Israel local HH:mm to UTC Date objects
+        const openTime = israelTimeToUTC(dayStart, availability.startTime);
+        const closeTime = israelTimeToUTC(dayStart, availability.endTime);
         const latestStart = new Date(closeTime.getTime() - durationMs);
 
         const availableSlots: { start: string; end: string }[] = [];

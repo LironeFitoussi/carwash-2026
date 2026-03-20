@@ -19,8 +19,8 @@ export interface IWorkerModel extends Model<IWorkerDoc> {}
 export interface IWorkerAvailability {
     workerId: Types.ObjectId;
     date: Date;       // The calendar date (time portion zeroed out)
-    startTime: string; // "HH:mm" in UTC, e.g. "08:30"
-    endTime: string;   // "HH:mm" in UTC, e.g. "17:00"
+    startTime: string; // "HH:mm" in Asia/Jerusalem local time, e.g. "08:30"
+    endTime: string;   // "HH:mm" in Asia/Jerusalem local time, e.g. "17:00"
 }
 
 export interface IWorkerAvailabilityDoc extends IWorkerAvailability, Document {

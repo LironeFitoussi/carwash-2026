@@ -40,6 +40,13 @@ export const switchAppointmentStatus = async (id: string, status: AppointmentSta
     return data.data;
 };
 
+export const checkDuplicateAppointment = async (clientId: string): Promise<{ hasActiveAppointments: boolean; appointments: IAppointment[] }> => {
+    const { data } = await api.get('/api/appointments/check-duplicate', {
+        params: { clientId },
+    });
+    return data.data;
+};
+
 export const getNextAvailable = async (workerId: string, carSize: string): Promise<INextAvailable> => {
     const { data } = await api.get('/api/appointments/next-available', {
         params: { workerId, carSize },

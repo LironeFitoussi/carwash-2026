@@ -45,7 +45,7 @@ createRoot(document.getElementById("root")!).render(
         <AppInitializer>
           <RouterProvider router={router} />
         </AppInitializer>
-        <ReactQueryDevtools initialIsOpen={false} />
+        {/* <ReactQueryDevtools initialIsOpen={false} /> */}
         <Toaster position="top-right" richColors />
       </QueryClientProvider>
     </Auth0Provider>

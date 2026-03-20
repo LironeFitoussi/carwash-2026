@@ -1,9 +1,11 @@
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
+import { CheckCircle, CircleCheck, XCircle, Pencil, Trash2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import AppointmentForm from './AppointmentForm';
-import type { IAppointment, CreateAppointmentInput } from '@/types';
+import { utcToDatetimeLocal } from '@/lib/utils';
+import type { IAppointment, AppointmentStatus, CreateAppointmentInput } from '@/types';
 
 interface AppointmentDialogsProps {
     editAppointment: IAppointment | null;
@@ -14,6 +16,9 @@ interface AppointmentDialogsProps {
     onDetailsClose: () => void;
     onEditSubmit: (data: CreateAppointmentInput) => void;
     onDeleteConfirm: () => void;
+    onStatusChange?: (id: string, status: AppointmentStatus) => void;
+    onEditFromDetails?: (appointment: IAppointment) => void;
+    onDeleteFromDetails?: (appointment: IAppointment) => void;
     isEditLoading?: boolean;
     isDeleteLoading?: boolean;
 }
@@ -47,6 +52,9 @@ export default function AppointmentDialogs({
     onDetailsClose,
     onEditSubmit,
     onDeleteConfirm,
+    onStatusChange,
+    onEditFromDetails,
+    onDeleteFromDetails,
     isEditLoading,
     isDeleteLoading,
 }: AppointmentDialogsProps) {
@@ -66,7 +74,7 @@ export default function AppointmentDialogs({
                                 clientId: getClientId(editAppointment.clientId),
                                 workerId: getWorkerId(editAppointment.workerId),
                                 serviceType: editAppointment.serviceType,
-                                startTime: editAppointment.startTime.slice(0, 16),
+                                startTime: utcToDatetimeLocal(editAppointment.startTime),
                                 status: editAppointment.status,
                                 notes: editAppointment.notes,
                                 isPickedUp: editAppointment.isPickedUp,
@@ -153,6 +161,65 @@ export default function AppointmentDialogs({
                                     </div>
                                 )}
                             </div>
+                        </div>
+                    )}
+                    {/* Quick Actions */}
+                    {detailsAppointment && onStatusChange && (
+                        <div className="flex flex-wrap gap-2 pt-2 border-t">
+                            {detailsAppointment.status !== 'confirmed' && detailsAppointment.status !== 'completed' && detailsAppointment.status !== 'cancelled' && (
+                                <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                                    onClick={() => { onStatusChange(detailsAppointment._id, 'confirmed'); onDetailsClose(); }}
+                                >
+                                    <CheckCircle className="w-4 h-4 me-1" />
+                                    {t('appointments.actions.confirm')}
+                                </Button>
+                            )}
+                            {detailsAppointment.status !== 'completed' && detailsAppointment.status !== 'cancelled' && (
+                                <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="text-green-600 border-green-200 hover:bg-green-50"
+                                    onClick={() => { onStatusChange(detailsAppointment._id, 'completed'); onDetailsClose(); }}
+                                >
+                                    <CircleCheck className="w-4 h-4 me-1" />
+                                    {t('appointments.actions.complete')}
+                                </Button>
+                            )}
+                            {detailsAppointment.status !== 'cancelled' && detailsAppointment.status !== 'completed' && (
+                                <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="text-red-600 border-red-200 hover:bg-red-50"
+                                    onClick={() => { onStatusChange(detailsAppointment._id, 'cancelled'); onDetailsClose(); }}
+                                >
+                                    <XCircle className="w-4 h-4 me-1" />
+                                    {t('appointments.actions.cancel')}
+                                </Button>
+                            )}
+                            {onEditFromDetails && (
+                                <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => { onEditFromDetails(detailsAppointment); onDetailsClose(); }}
+                                >
+                                    <Pencil className="w-4 h-4 me-1" />
+                                    {t('common.edit')}
+                                </Button>
+                            )}
+                            {onDeleteFromDetails && (
+                                <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="text-red-600 border-red-200 hover:bg-red-50"
+                                    onClick={() => { onDeleteFromDetails(detailsAppointment); onDetailsClose(); }}
+                                >
+                                    <Trash2 className="w-4 h-4 me-1" />
+                                    {t('common.delete')}
+                                </Button>
+                            )}
                         </div>
                     )}
                     <DialogFooter>

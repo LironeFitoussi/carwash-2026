@@ -18,6 +18,16 @@
     "workers": "Workers",
     "settings": "Settings"
   },
+  "sidebar": {
+    "All Appointments": "All Appointments",
+    "Add Appointment": "Add Appointment",
+    "All Clients": "All Clients",
+    "New Client": "New Client",
+    "All Workers": "All Workers",
+    "Add Worker": "Add Worker",
+    "Schedule": "Schedule",
+    "Car Sizes": "Car Sizes"
+  },
   "common": {
     "loading": "Loading...",
     "save": "Save",
@@ -143,9 +153,19 @@
       "title": "Appointment Details",
       "description": "View appointment information"
     },
+    "actions": {
+      "confirm": "Confirm",
+      "complete": "Complete",
+      "cancel": "Cancel"
+    },
     "conflict": {
       "title": "Time Conflict",
       "description": "This worker already has an appointment that overlaps with the selected time."
+    },
+    "duplicate": {
+      "title": "Client Already Scheduled",
+      "description": "This client already has an active appointment. They may have multiple cars, so you can proceed if needed.",
+      "proceed": "Proceed Anyway"
     }
   },
   "settings": {
@@ -242,7 +262,14 @@
       "remove_day": "Mark day as non-working",
       "mark_off": "Remove Day",
       "day_removed": "Day marked as non-working",
-      "date": "Date"
+      "updated": "Hours updated",
+      "date": "Date",
+      "select_worker": "Select a worker to manage their schedule",
+      "tabs": {
+        "schedule": "Schedule",
+        "assign": "Assign Hours",
+        "dayOff": "Day Off"
+      }
     },
     "form": {
       "name": "Full Name",

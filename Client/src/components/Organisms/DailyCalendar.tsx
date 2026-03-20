@@ -1,11 +1,24 @@
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
+import DragGhostBlock from '@/components/atoms/DragGhostBlock';
 import type { IAppointment } from '@/types';
+
+interface DragGhost {
+    date: Date;
+    top: number;
+    height: number;
+    timeLabel: string;
+}
 
 interface DailyCalendarProps {
     appointments: IAppointment[];
     currentDate?: Date;
     onAppointmentClick?: (appointment: IAppointment) => void;
+    onGridMouseDown?: (e: React.MouseEvent, date: Date) => void;
+    onGridMouseMove?: (e: React.MouseEvent) => void;
+    onGridMouseUp?: () => void;
+    dragGhost?: DragGhost | null;
+    isDragging?: boolean;
 }
 
 const HOUR_START = 8;
@@ -43,7 +56,7 @@ function getTopOffset(startTime: string): number {
     return (hour - HOUR_START) * HOUR_HEIGHT + (minute / 60) * HOUR_HEIGHT;
 }
 
-export default function DailyCalendar({ appointments, currentDate = new Date(), onAppointmentClick }: DailyCalendarProps) {
+export default function DailyCalendar({ appointments, currentDate = new Date(), onAppointmentClick, onGridMouseDown, onGridMouseMove, onGridMouseUp, dragGhost, isDragging }: DailyCalendarProps) {
     const { t } = useTranslation();
 
     const dayAppointments = appointments.filter((apt) => {
@@ -80,7 +93,13 @@ export default function DailyCalendar({ appointments, currentDate = new Date(), 
                 </div>
 
                 {/* Day column */}
-                <div className="flex-1 border-l relative" style={{ height: totalHeight }}>
+                <div
+                    className={`flex-1 border-l relative ${isDragging ? 'select-none' : ''} ${onGridMouseDown ? 'cursor-crosshair' : ''}`}
+                    style={{ height: totalHeight }}
+                    onMouseDown={(e) => onGridMouseDown?.(e, currentDate)}
+                    onMouseMove={onGridMouseMove}
+                    onMouseUp={onGridMouseUp}
+                >
                     {/* Hour lines */}
                     {HOURS.map((hour) => (
                         <div
@@ -89,6 +108,11 @@ export default function DailyCalendar({ appointments, currentDate = new Date(), 
                             style={{ top: (hour - HOUR_START) * HOUR_HEIGHT }}
                         />
                     ))}
+
+                    {/* Drag ghost block */}
+                    {dragGhost && (
+                        <DragGhostBlock top={dragGhost.top} height={dragGhost.height} timeLabel={dragGhost.timeLabel} />
+                    )}
 
                     {/* Appointments */}
                     {dayAppointments.map((apt) => {
@@ -100,6 +124,7 @@ export default function DailyCalendar({ appointments, currentDate = new Date(), 
                         return (
                             <button
                                 key={apt._id}
+                                onMouseDown={(e) => e.stopPropagation()}
                                 onClick={() => onAppointmentClick?.(apt)}
                                 className={`absolute left-1 right-1 border rounded text-sm p-2 text-left cursor-pointer hover:brightness-95 transition-all ${colorClass} ${opacityClass}`}
                                 style={{ top, height: HOUR_HEIGHT - 4 }}
@@ -117,7 +142,7 @@ export default function DailyCalendar({ appointments, currentDate = new Date(), 
                         );
                     })}
 
-                    {dayAppointments.length === 0 && (
+                    {dayAppointments.length === 0 && !dragGhost && (
                         <div className="flex items-center justify-center h-full text-gray-400 text-sm">
                             {t('appointments.calendar.no_appointments')}
                         </div>

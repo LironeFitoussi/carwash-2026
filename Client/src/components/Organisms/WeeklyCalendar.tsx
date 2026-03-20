@@ -1,11 +1,24 @@
 import { useTranslation } from 'react-i18next';
 import { format, startOfWeek, addDays } from 'date-fns';
+import DragGhostBlock from '@/components/atoms/DragGhostBlock';
 import type { IAppointment } from '@/types';
+
+interface DragGhost {
+    date: Date;
+    top: number;
+    height: number;
+    timeLabel: string;
+}
 
 interface WeeklyCalendarProps {
     appointments: IAppointment[];
     currentDate?: Date;
     onAppointmentClick?: (appointment: IAppointment) => void;
+    onGridMouseDown?: (e: React.MouseEvent, date: Date) => void;
+    onGridMouseMove?: (e: React.MouseEvent) => void;
+    onGridMouseUp?: () => void;
+    dragGhost?: DragGhost | null;
+    isDragging?: boolean;
 }
 
 const HOUR_START = 8;
@@ -38,7 +51,11 @@ function getTopOffset(startTime: string): number {
     return (hour - HOUR_START) * HOUR_HEIGHT + (minute / 60) * HOUR_HEIGHT;
 }
 
-export default function WeeklyCalendar({ appointments, currentDate = new Date(), onAppointmentClick }: WeeklyCalendarProps) {
+function isSameDay(a: Date, b: Date): boolean {
+    return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+}
+
+export default function WeeklyCalendar({ appointments, currentDate = new Date(), onAppointmentClick, onGridMouseDown, onGridMouseMove, onGridMouseUp, dragGhost, isDragging }: WeeklyCalendarProps) {
     const { t } = useTranslation();
     const weekStart = startOfWeek(currentDate, { weekStartsOn: 0 });
     const days = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
@@ -88,8 +105,11 @@ export default function WeeklyCalendar({ appointments, currentDate = new Date(),
                     {days.map((day) => (
                         <div
                             key={day.toISOString()}
-                            className="flex-1 border-l relative"
+                            className={`flex-1 border-l relative ${isDragging ? 'select-none' : ''} ${onGridMouseDown ? 'cursor-crosshair' : ''}`}
                             style={{ height: totalHeight }}
+                            onMouseDown={(e) => onGridMouseDown?.(e, day)}
+                            onMouseMove={onGridMouseMove}
+                            onMouseUp={onGridMouseUp}
                         >
                             {/* Hour lines */}
                             {HOURS.map((hour) => (
@@ -99,6 +119,11 @@ export default function WeeklyCalendar({ appointments, currentDate = new Date(),
                                     style={{ top: (hour - HOUR_START) * HOUR_HEIGHT }}
                                 />
                             ))}
+
+                            {/* Drag ghost block */}
+                            {dragGhost && isSameDay(dragGhost.date, day) && (
+                                <DragGhostBlock top={dragGhost.top} height={dragGhost.height} timeLabel={dragGhost.timeLabel} />
+                            )}
 
                             {/* Appointments */}
                             {appointmentsByDay(day).map((apt) => {
@@ -110,6 +135,7 @@ export default function WeeklyCalendar({ appointments, currentDate = new Date(),
                                 return (
                                     <button
                                         key={apt._id}
+                                        onMouseDown={(e) => e.stopPropagation()}
                                         onClick={() => onAppointmentClick?.(apt)}
                                         className={`absolute left-0.5 right-0.5 border rounded text-xs p-1 text-left cursor-pointer hover:brightness-95 transition-all ${colorClass} ${opacityClass}`}
                                         style={{ top, height: HOUR_HEIGHT - 4 }}

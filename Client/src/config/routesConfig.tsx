@@ -11,7 +11,7 @@ import NewClient from "../pages/NewClient";
 import Workers from "../pages/Workers";
 import AddWorker from "../pages/AddWorker";
 import CarSizeSettings from "../pages/CarSizeSettings";
-import WorkerSchedule from "../pages/WorkerSchedule";
+
 
 // Type for Lucide icons
 export type LucideIcon = ComponentType<SVGProps<SVGSVGElement>>;
@@ -116,12 +116,6 @@ export const routeConfig: RouteConfig[] = [
         path: "new",
         name: "Add Worker",
         Component: AddWorker,
-        showInSidebar: true,
-      },
-      {
-        path: "schedule",
-        name: "Schedule",
-        Component: WorkerSchedule,
         showInSidebar: true,
       },
     ],

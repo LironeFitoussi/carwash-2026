@@ -7,8 +7,9 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import AppointmentForm from '@/components/organisms/AppointmentForm';
 import ClientForm from '@/components/organisms/ClientForm';
-import { createAppointment } from '@/services/appointments';
+import { createAppointment, checkDuplicateAppointment } from '@/services/appointments';
 import { createClient } from '@/services/clients';
+import { datetimeLocalToUTC } from '@/lib/utils';
 import type { CreateAppointmentInput, CreateClientInput, IAppointment } from '@/types';
 
 export default function AddAppointment() {
@@ -19,6 +20,7 @@ export default function AddAppointment() {
     const [clientMode, setClientMode] = useState<'existing' | 'new'>('existing');
     const [newClientData, setNewClientData] = useState<CreateClientInput | null>(null);
     const [conflictDialog, setConflictDialog] = useState<{ conflicts: IAppointment[] } | null>(null);
+    const [duplicateDialog, setDuplicateDialog] = useState<{ appointments: IAppointment[]; pendingData: CreateAppointmentInput } | null>(null);
 
     const mutation = useMutation({
         mutationFn: createAppointment,
@@ -38,9 +40,8 @@ export default function AddAppointment() {
         },
     });
 
-    const handleSubmit = async (data: CreateAppointmentInput) => {
+    const resolveClientId = async (data: CreateAppointmentInput): Promise<string | null> => {
         let clientId = data.clientId;
-
         if (clientMode === 'new' && newClientData) {
             try {
                 const created = await createClient(newClientData);
@@ -48,11 +49,36 @@ export default function AddAppointment() {
                 queryClient.invalidateQueries({ queryKey: ['clients'] });
             } catch {
                 toast.error(t('clients.create_error'));
-                return;
+                return null;
             }
         }
+        return clientId;
+    };
 
-        mutation.mutate({ ...data, clientId });
+    const handleSubmit = async (data: CreateAppointmentInput) => {
+        const clientId = await resolveClientId(data);
+        if (!clientId) return;
+
+        const finalData = { ...data, clientId, startTime: datetimeLocalToUTC(data.startTime) };
+
+        try {
+            const result = await checkDuplicateAppointment(clientId);
+            if (result.hasActiveAppointments) {
+                setDuplicateDialog({ appointments: result.appointments, pendingData: finalData });
+                return;
+            }
+        } catch {
+            // If check fails, proceed anyway
+        }
+
+        mutation.mutate(finalData);
+    };
+
+    const handleDuplicateBypass = () => {
+        if (duplicateDialog) {
+            mutation.mutate(duplicateDialog.pendingData);
+            setDuplicateDialog(null);
+        }
     };
 
     function getClientName(clientId: IAppointment['clientId']): string {
@@ -125,6 +151,32 @@ export default function AddAppointment() {
                     )}
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setConflictDialog(null)}>{t('common.close')}</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Duplicate appointment warning dialog */}
+            <Dialog open={!!duplicateDialog} onOpenChange={(open) => !open && setDuplicateDialog(null)}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>{t('appointments.duplicate.title')}</DialogTitle>
+                    </DialogHeader>
+                    <p className="text-sm text-gray-600">{t('appointments.duplicate.description')}</p>
+                    {duplicateDialog && (
+                        <div className="space-y-2 mt-2">
+                            {duplicateDialog.appointments.map((a) => (
+                                <div key={a._id} className="text-sm border rounded px-3 py-2">
+                                    <p className="font-medium">{getClientName(a.clientId)}</p>
+                                    <p className="text-gray-500">
+                                        {new Date(a.startTime).toLocaleString()} — {t(`appointments.status.${a.status}`)}
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                    <DialogFooter className="gap-2">
+                        <Button variant="outline" onClick={() => setDuplicateDialog(null)}>{t('common.cancel')}</Button>
+                        <Button onClick={handleDuplicateBypass}>{t('appointments.duplicate.proceed')}</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

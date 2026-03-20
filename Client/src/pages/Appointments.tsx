@@ -1,16 +1,20 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router';
 import { format, addDays, addWeeks, subDays, subWeeks } from 'date-fns';
+import { toast } from 'sonner';
+import { datetimeLocalToUTC } from '@/lib/utils';
 import { ChevronLeft, ChevronRight, Plus, Car } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import WeeklyCalendar from '@/components/organisms/WeeklyCalendar';
 import DailyCalendar from '@/components/organisms/DailyCalendar';
 import AppointmentDialogs from '@/components/organisms/AppointmentDialogs';
-import { getAppointments } from '@/services/appointments';
+import CreateAppointmentDialog from '@/components/organisms/CreateAppointmentDialog';
+import { getAppointments, createAppointment } from '@/services/appointments';
 import { useAppointmentMutations } from '@/hooks/useAppointmentMutations';
+import { useCalendarDrag } from '@/hooks/useCalendarDrag';
 import type { IAppointment, CreateAppointmentInput } from '@/types';
 
 type ViewMode = 'daily' | 'weekly';
@@ -42,12 +46,53 @@ export default function Appointments() {
     const [deleteAppointment, setDeleteAppointment] = useState<IAppointment | null>(null);
     const [detailsAppointment, setDetailsAppointment] = useState<IAppointment | null>(null);
 
+    const [createDialogOpen, setCreateDialogOpen] = useState(false);
+    const [createInitialTime, setCreateInitialTime] = useState('');
+
+    const queryClient = useQueryClient();
+
+    const handleDragEnd = useCallback((_date: Date, startTimeStr: string) => {
+        setCreateInitialTime(startTimeStr);
+        setCreateDialogOpen(true);
+    }, []);
+
+    const { isDragging, handleMouseDown, handleMouseMove, handleMouseUp, clearSelection, dragGhost } = useCalendarDrag({
+        hourStart: 8,
+        hourEnd: 21,
+        hourHeight: 80,
+        snapMinutes: 15,
+        onDragEnd: handleDragEnd,
+    });
+
     const { data: appointments = [], isLoading } = useQuery({
         queryKey: ['appointments'],
         queryFn: getAppointments,
     });
 
     const { statusMutation, updateMutation, deleteMutation } = useAppointmentMutations();
+
+    const createMutation = useMutation({
+        mutationFn: createAppointment,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['appointments'] });
+            toast.success(t('appointments.form.created'));
+            setCreateDialogOpen(false);
+            clearSelection();
+        },
+        onError: () => {
+            toast.error(t('common.error'));
+        },
+    });
+
+    const handleCreateSubmit = (data: CreateAppointmentInput) => {
+        const converted = { ...data, startTime: datetimeLocalToUTC(data.startTime) };
+        createMutation.mutate(converted);
+    };
+
+    const handleCreateClose = () => {
+        setCreateDialogOpen(false);
+        clearSelection();
+    };
 
     const handlePrev = () => {
         if (viewMode === 'daily') setCurrentDate((d) => subDays(d, 1));
@@ -61,7 +106,8 @@ export default function Appointments() {
 
     const handleEditSubmit = (data: CreateAppointmentInput) => {
         if (!editAppointment) return;
-        updateMutation.mutate({ id: editAppointment._id, data }, { onSuccess: () => setEditAppointment(null) });
+        const converted = { ...data, startTime: datetimeLocalToUTC(data.startTime) };
+        updateMutation.mutate({ id: editAppointment._id, data: converted }, { onSuccess: () => setEditAppointment(null) });
     };
 
     const handleDeleteConfirm = () => {
@@ -131,6 +177,11 @@ export default function Appointments() {
                                 appointments={appointments}
                                 currentDate={currentDate}
                                 onAppointmentClick={setDetailsAppointment}
+                                onGridMouseDown={handleMouseDown}
+                                onGridMouseMove={handleMouseMove}
+                                onGridMouseUp={handleMouseUp}
+                                dragGhost={dragGhost}
+                                isDragging={isDragging}
                             />
                         </div>
                         <div className="hidden md:block">
@@ -139,12 +190,22 @@ export default function Appointments() {
                                     appointments={appointments}
                                     currentDate={currentDate}
                                     onAppointmentClick={setDetailsAppointment}
+                                    onGridMouseDown={handleMouseDown}
+                                    onGridMouseMove={handleMouseMove}
+                                    onGridMouseUp={handleMouseUp}
+                                    dragGhost={dragGhost}
+                                    isDragging={isDragging}
                                 />
                             ) : (
                                 <WeeklyCalendar
                                     appointments={appointments}
                                     currentDate={currentDate}
                                     onAppointmentClick={setDetailsAppointment}
+                                    onGridMouseDown={handleMouseDown}
+                                    onGridMouseMove={handleMouseMove}
+                                    onGridMouseUp={handleMouseUp}
+                                    dragGhost={dragGhost}
+                                    isDragging={isDragging}
                                 />
                             )}
                         </div>
@@ -250,8 +311,19 @@ export default function Appointments() {
                 onDetailsClose={() => setDetailsAppointment(null)}
                 onEditSubmit={handleEditSubmit}
                 onDeleteConfirm={handleDeleteConfirm}
+                onStatusChange={(id, status) => statusMutation.mutate({ id, status })}
+                onEditFromDetails={setEditAppointment}
+                onDeleteFromDetails={setDeleteAppointment}
                 isEditLoading={updateMutation.isPending}
                 isDeleteLoading={deleteMutation.isPending}
+            />
+
+            <CreateAppointmentDialog
+                open={createDialogOpen}
+                initialStartTime={createInitialTime}
+                onClose={handleCreateClose}
+                onSubmit={handleCreateSubmit}
+                isLoading={createMutation.isPending}
             />
         </div>
     );

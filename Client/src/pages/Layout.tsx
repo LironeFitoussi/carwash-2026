@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Outlet } from "react-router";
 import { useAuth0 } from "@auth0/auth0-react";
 import { Link, useLocation } from "react-router";
 import { Menu, X, Car, LogOut } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { AnimatePresence, motion } from "framer-motion";
 import { useAppSelector } from "@/redux/hooks";
 import { getSidebarMenuItems, routeConfig } from "@/config/routesConfig";
 import LanguageToggle from "@/components/molecules/LanguageToggle";
@@ -16,6 +17,16 @@ export default function Layout() {
     const location = useLocation();
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const isRtl = i18n.language === "he";
+
+    // Lock body scroll when mobile sidebar is open
+    useEffect(() => {
+        if (sidebarOpen) {
+            document.body.style.overflow = "hidden";
+        } else {
+            document.body.style.overflow = "";
+        }
+        return () => { document.body.style.overflow = ""; };
+    }, [sidebarOpen]);
 
     // If we have a user in Redux, they are authenticated — use that as truth
     const menuItems = getSidebarMenuItems(routeConfig, !!user, user?.role);
@@ -52,7 +63,7 @@ export default function Layout() {
                             </p>
                         )}
                         {item.subMenus && (
-                            <div className="ml-4 mt-1 space-y-1">
+                            <div className="ms-4 mt-1 space-y-1">
                                 {item.subMenus.map((sub) => (
                                     <Link
                                         key={sub.path}
@@ -64,7 +75,7 @@ export default function Layout() {
                                                 : "text-gray-500 hover:bg-gray-100 hover:text-gray-900"
                                         }`}
                                     >
-                                        {sub.label}
+                                        {t(`sidebar.${sub.label}`)}
                                     </Link>
                                 ))}
                             </div>
@@ -124,34 +135,50 @@ export default function Layout() {
             </aside>
 
             {/* ── Mobile sidebar overlay ── */}
-            {sidebarOpen && (
-                <div className="fixed inset-0 z-40 md:hidden">
-                    <div className="absolute inset-0 bg-black/40" onClick={() => setSidebarOpen(false)} />
-                    <aside className="absolute start-0 inset-y-0 w-72 bg-white flex flex-col shadow-xl">
-                        <div className="h-14 flex items-center justify-between px-5 border-b border-gray-200">
-                            <Link to="/dashboard" className="flex items-center gap-2 font-bold text-blue-600" onClick={() => setSidebarOpen(false)}>
-                                <Car className="w-5 h-5" />
-                                {t("app.title")}
-                            </Link>
-                            <button type="button" title="Close menu" onClick={() => setSidebarOpen(false)}>
-                                <X className="w-5 h-5 text-gray-500" />
-                            </button>
-                        </div>
-                        <nav className="flex-1 overflow-y-auto p-3 space-y-1">
-                            <NavLinks onClick={() => setSidebarOpen(false)} />
-                        </nav>
-                        <div className="border-t border-gray-200 p-4 space-y-3">
-                            <div className="flex items-center gap-2">
-                                <LanguageToggle />
-                                <Button variant="outline" size="sm" className="flex-1 gap-1" onClick={handleLogout}>
-                                    <LogOut className="w-3.5 h-3.5" />
-                                    {t("auth.logout")}
-                                </Button>
+            <AnimatePresence>
+                {sidebarOpen && (
+                    <div className="fixed inset-0 z-40 md:hidden overscroll-contain">
+                        <motion.div
+                            className="absolute inset-0 bg-black/40 touch-none"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.2 }}
+                            onClick={() => setSidebarOpen(false)}
+                        />
+                        <motion.aside
+                            className="absolute inset-y-0 w-72 bg-white flex flex-col shadow-xl overscroll-contain"
+                            style={{ [isRtl ? "right" : "left"]: 0 }}
+                            initial={{ x: isRtl ? "100%" : "-100%" }}
+                            animate={{ x: 0 }}
+                            exit={{ x: isRtl ? "100%" : "-100%" }}
+                            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                        >
+                            <div className="h-14 flex items-center justify-between px-5 border-b border-gray-200">
+                                <Link to="/dashboard" className="flex items-center gap-2 font-bold text-blue-600" onClick={() => setSidebarOpen(false)}>
+                                    <Car className="w-5 h-5" />
+                                    {t("app.title")}
+                                </Link>
+                                <button type="button" title={t("common.close")} onClick={() => setSidebarOpen(false)}>
+                                    <X className="w-5 h-5 text-gray-500" />
+                                </button>
                             </div>
-                        </div>
-                    </aside>
-                </div>
-            )}
+                            <nav className="flex-1 overflow-y-auto p-3 space-y-1">
+                                <NavLinks onClick={() => setSidebarOpen(false)} />
+                            </nav>
+                            <div className="border-t border-gray-200 p-4 space-y-3">
+                                <div className="flex items-center gap-2">
+                                    <LanguageToggle />
+                                    <Button variant="outline" size="sm" className="flex-1 gap-1" onClick={handleLogout}>
+                                        <LogOut className="w-3.5 h-3.5" />
+                                        {t("auth.logout")}
+                                    </Button>
+                                </div>
+                            </div>
+                        </motion.aside>
+                    </div>
+                )}
+            </AnimatePresence>
 
             {/* ── Main area ── */}
             <div className="flex-1 flex flex-col min-h-screen">

@@ -8,6 +8,7 @@ const controller = new AppointmentsController();
 
 router.use(auth0Middleware);
 
+router.get("/check-duplicate", asyncHandler(controller.checkDuplicate.bind(controller)));
 router.get("/next-available", asyncHandler(controller.getNextAvailable.bind(controller)));
 router.get("/worker/:workerId", asyncHandler(controller.getAppointmentsByWorker.bind(controller)));
 router.get("/client/:clientId", asyncHandler(controller.getAppointmentsByClient.bind(controller)));

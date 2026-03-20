@@ -18,6 +18,16 @@
     "workers": "עובדים",
     "settings": "הגדרות"
   },
+  "sidebar": {
+    "All Appointments": "כל התורים",
+    "Add Appointment": "הוסף תור",
+    "All Clients": "כל הלקוחות",
+    "New Client": "לקוח חדש",
+    "All Workers": "כל העובדים",
+    "Add Worker": "הוסף עובד",
+    "Schedule": "לוח זמנים",
+    "Car Sizes": "גדלי רכב"
+  },
   "common": {
     "loading": "טוען...",
     "save": "שמור",
@@ -143,9 +153,19 @@
       "title": "פרטי תור",
       "description": "צפה בפרטי התור"
     },
+    "actions": {
+      "confirm": "אשר תור",
+      "complete": "סמן כהושלם",
+      "cancel": "בטל תור"
+    },
     "conflict": {
       "title": "התנגשות בזמן",
       "description": "לעובד זה כבר יש תור שמתנגש עם הזמן שנבחר."
+    },
+    "duplicate": {
+      "title": "ללקוח כבר יש תור",
+      "description": "ללקוח זה כבר יש תור פעיל. ייתכן שיש לו מספר רכבים, ניתן להמשיך במידת הצורך.",
+      "proceed": "המשך בכל זאת"
     }
   },
   "settings": {
@@ -241,7 +261,14 @@
       "remove_day": "סמן יום כלא עובד",
       "mark_off": "הסר יום",
       "day_removed": "היום סומן כלא עובד",
-      "date": "תאריך"
+      "updated": "השעות עודכנו",
+      "date": "תאריך",
+      "select_worker": "בחר עובד לניהול לוח הזמנים שלו",
+      "tabs": {
+        "schedule": "לוח זמנים",
+        "assign": "הקצאת שעות",
+        "dayOff": "יום חופש"
+      }
     },
     "form": {
       "name": "שם מלא",

@@ -5,6 +5,7 @@ import WorkerAvailability from "../models/WorkerAvailability.js";
 import { createAppointmentSchema, updateAppointmentSchema } from "../zod/appointmentsZod.js";
 import { AppError } from "../utils/errorHandler.js";
 import { getDurationMinutes } from "../utils/carSizeDuration.js";
+import { israelTimeToUTC, isSameIsraelDay, getIsraelHoursMinutes } from "../utils/timezone.js";
 import type { CarSize } from "../types/index";
 
 function parseTime(timeStr: string): { hours: number; minutes: number } {
@@ -13,7 +14,9 @@ function parseTime(timeStr: string): { hours: number; minutes: number } {
 }
 
 function checkHours(startTime: Date, durationMinutes: number, scheduleStart: string, scheduleEnd: string): boolean {
-    const startTotal = startTime.getUTCHours() * 60 + startTime.getUTCMinutes();
+    // Convert startTime to Israel hours/minutes for comparison with schedule (which is in Israel time)
+    const israelTime = getIsraelHoursMinutes(startTime);
+    const startTotal = israelTime.hours * 60 + israelTime.minutes;
     const endTotal = startTotal + durationMinutes;
     const openParsed = parseTime(scheduleStart);
     const closeParsed = parseTime(scheduleEnd);
@@ -180,6 +183,28 @@ class AppointmentsController {
         res.status(200).json({ success: true, message: 'Appointment deleted successfully' });
     }
 
+    async checkDuplicate(req: Request, res: Response) {
+        const { clientId } = req.query;
+        if (!clientId || typeof clientId !== 'string') {
+            throw new AppError('clientId query parameter is required', 400);
+        }
+
+        const activeAppointments = await Appointment.find({
+            clientId,
+            status: { $in: ['pending', 'confirmed'] },
+        })
+            .sort({ startTime: 1 })
+            .populate(POPULATE_OPTIONS);
+
+        res.status(200).json({
+            success: true,
+            data: {
+                hasActiveAppointments: activeAppointments.length > 0,
+                appointments: activeAppointments,
+            },
+        });
+    }
+
     async getNextAvailable(req: Request, res: Response) {
         const { workerId, carSize } = req.query;
 
@@ -229,25 +254,20 @@ class AppointmentsController {
 
         // Scan each available date
         for (const avail of availabilityDates) {
-            const openParsed = parseTime(avail.startTime);
-            const closeParsed = parseTime(avail.endTime);
-
-            const openTime = new Date(avail.date);
-            openTime.setUTCHours(openParsed.hours, openParsed.minutes, 0, 0);
-
-            const closeTime = new Date(avail.date);
-            closeTime.setUTCHours(closeParsed.hours, closeParsed.minutes, 0, 0);
+            // Convert Israel local HH:mm to UTC Date objects
+            const openTime = israelTimeToUTC(avail.date, avail.startTime);
+            const closeTime = israelTimeToUTC(avail.date, avail.endTime);
             const latestStart = new Date(closeTime.getTime() - durationMs);
 
-            // If this is today, start from now
-            const isToday = avail.date.toDateString() === now.toDateString();
+            // If this is today (in Israel timezone), start from now
+            const isToday = isSameIsraelDay(avail.date, now);
             let startFrom = isToday ? new Date(Math.max(now.getTime(), openTime.getTime())) : openTime;
 
             // Round up to next 15-minute increment
-            const mins = startFrom.getUTCMinutes();
-            const roundedMins = Math.ceil(mins / 15) * 15;
+            const totalMins = startFrom.getUTCHours() * 60 + startFrom.getUTCMinutes();
+            const roundedMins = Math.ceil(totalMins / 15) * 15;
             startFrom = new Date(startFrom);
-            startFrom.setUTCMinutes(roundedMins, 0, 0);
+            startFrom.setUTCHours(Math.floor(roundedMins / 60), roundedMins % 60, 0, 0);
 
             for (
                 let candidate = new Date(startFrom);

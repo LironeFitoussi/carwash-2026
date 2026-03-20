@@ -1,0 +1,289 @@
+{
+  "app": { "title": "Service de Lavage Auto" },
+  "auth": {
+    "login": "Se connecter",
+    "signup": "S'inscrire",
+    "email": "E-mail",
+    "password": "Mot de passe",
+    "logout": "Déconnexion",
+    "google": "Continuer avec Google",
+    "subtitle": "Connectez-vous pour gérer votre entreprise de lavage auto",
+    "toggle_signin": "Vous avez déjà un compte ? Se connecter",
+    "toggle_signup": "Pas encore de compte ? S'inscrire"
+  },
+  "navigation": {
+    "dashboard": "Tableau de bord",
+    "appointments": "Rendez-vous",
+    "clients": "Clients",
+    "workers": "Employés",
+    "settings": "Paramètres"
+  },
+  "sidebar": {
+    "All Appointments": "Tous les rendez-vous",
+    "Add Appointment": "Ajouter un rendez-vous",
+    "All Clients": "Tous les clients",
+    "New Client": "Nouveau client",
+    "All Workers": "Tous les employés",
+    "Add Worker": "Ajouter un employé",
+    "Schedule": "Planning",
+    "Car Sizes": "Tailles de véhicule"
+  },
+  "common": {
+    "loading": "Chargement...",
+    "save": "Enregistrer",
+    "saving": "Enregistrement...",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "deleting": "Suppression...",
+    "edit": "Modifier",
+    "close": "Fermer",
+    "confirm": "Confirmer",
+    "search": "Rechercher",
+    "add": "Ajouter",
+    "active": "Actif",
+    "inactive": "Inactif",
+    "actions": "Actions",
+    "name": "Nom",
+    "email": "E-mail",
+    "phone": "Téléphone",
+    "notes": "Notes",
+    "status": "Statut",
+    "optional": "Facultatif",
+    "no_data": "Aucune donnée trouvée",
+    "no_results": "Aucun résultat trouvé",
+    "error": "Une erreur est survenue",
+    "yes": "Oui",
+    "no": "Non"
+  },
+  "dashboard": {
+    "title": "Tableau de bord",
+    "total_appointments": "Total des rendez-vous",
+    "active_clients": "Clients actifs",
+    "staff_members": "Employés",
+    "revenue": "Revenus",
+    "recent_appointments": "Rendez-vous récents",
+    "quick_stats": "Statistiques rapides",
+    "service_breakdown": "Répartition des services"
+  },
+  "appointments": {
+    "title": "Rendez-vous",
+    "subtitle": "Gérer les rendez-vous de lavage auto",
+    "add": "Ajouter un rendez-vous",
+    "all": "Tous les rendez-vous",
+    "loading": "Chargement des rendez-vous...",
+    "error": "Échec du chargement des rendez-vous",
+    "no_appointments": "Aucun rendez-vous trouvé",
+    "calendar": {
+      "title": "Calendrier",
+      "daily": "Journalier",
+      "weekly": "Hebdomadaire",
+      "today": "Aujourd'hui",
+      "no_appointments": "Aucun rendez-vous"
+    },
+    "table": {
+      "client": "Client",
+      "worker": "Employé",
+      "start_time": "Heure de début",
+      "service_type": "Service",
+      "vehicle_type": "Véhicule",
+      "status": "Statut",
+      "actions": "Actions",
+      "add": "Ajouter un rendez-vous"
+    },
+    "status": {
+      "pending": "En attente",
+      "confirmed": "Confirmé",
+      "completed": "Terminé",
+      "cancelled": "Annulé",
+      "update": "Mettre à jour le statut"
+    },
+    "vehicle_types": {
+      "small": "Petit",
+      "regular": "Standard",
+      "big": "Grand"
+    },
+    "service_types": {
+      "basic": "Basique",
+      "premium": "Premium",
+      "deluxe": "Deluxe"
+    },
+    "pickup": {
+      "service": "Service de ramassage",
+      "label": "Service de ramassage",
+      "location": "Lieu de ramassage",
+      "location_placeholder": "Entrez l'adresse de ramassage"
+    },
+    "form": {
+      "client": "Client",
+      "worker": "Employé",
+      "start_time": "Heure de début",
+      "service_type": "Type de service",
+      "vehicle_type": "Type de véhicule",
+      "status": "Statut",
+      "pickup": "Service de ramassage",
+      "pickup_location": "Lieu de ramassage",
+      "new_client": "Nouveau client",
+      "existing_client": "Client existant",
+      "search_client": "Rechercher un client par nom...",
+      "select_worker": "Sélectionner un employé",
+      "notes": "Notes",
+      "created": "Rendez-vous créé avec succès",
+      "suggest_next": "Suggérer le suivant",
+      "no_available_slots": "Aucun créneau disponible",
+      "duration": "Durée"
+    },
+    "edit": {
+      "title": "Modifier le rendez-vous",
+      "description": "Mettre à jour les détails du rendez-vous",
+      "saving": "Enregistrement..."
+    },
+    "delete": {
+      "title": "Supprimer le rendez-vous",
+      "description": "Êtes-vous sûr de vouloir supprimer ce rendez-vous ? Cette action est irréversible.",
+      "confirm": "Êtes-vous sûr de vouloir supprimer le rendez-vous de {{client}} le {{time}} ?",
+      "deleting": "Suppression...",
+      "success": "Rendez-vous supprimé",
+      "error": "Échec de la suppression du rendez-vous"
+    },
+    "update": {
+      "success": "Rendez-vous mis à jour",
+      "error": "Échec de la mise à jour du rendez-vous"
+    },
+    "details": {
+      "title": "Détails du rendez-vous",
+      "description": "Voir les informations du rendez-vous"
+    },
+    "actions": {
+      "confirm": "Confirmer",
+      "complete": "Terminer",
+      "cancel": "Annuler"
+    },
+    "conflict": {
+      "title": "Conflit d'horaire",
+      "description": "Cet employé a déjà un rendez-vous qui chevauche l'horaire sélectionné."
+    },
+    "duplicate": {
+      "title": "Client déjà planifié",
+      "description": "Ce client a déjà un rendez-vous actif. Il peut avoir plusieurs véhicules, vous pouvez continuer si nécessaire.",
+      "proceed": "Continuer quand même"
+    }
+  },
+  "settings": {
+    "title": "Paramètres",
+    "car_sizes": {
+      "title": "Paramètres des tailles de véhicule",
+      "description": "Configurer les tailles de véhicule et leurs durées de nettoyage",
+      "duration": "Durée (minutes)",
+      "label_en": "Libellé (anglais)",
+      "label_he": "Libellé (hébreu)",
+      "updated": "Configuration des tailles mise à jour"
+    }
+  },
+  "clients": {
+    "title": "Clients",
+    "add": "Ajouter un client",
+    "edit": "Modifier le client",
+    "updated": "Client mis à jour avec succès",
+    "all": "Tous les clients",
+    "loading": "Chargement des clients...",
+    "error": "Échec du chargement des clients",
+    "no_clients": "Aucun client trouvé",
+    "car_type": "Type de véhicule",
+    "car_types": {
+      "small": "Petit",
+      "medium": "Moyen",
+      "large": "Grand",
+      "motorcycle": "Moto"
+    },
+    "contact": "Contact",
+    "inactive": "inactif",
+    "call": "Appeler",
+    "sms": "SMS",
+    "whatsapp": "WhatsApp",
+    "created": "Client créé avec succès",
+    "deleted": "Client supprimé",
+    "create_error": "Échec de la création du client",
+    "details": {
+      "title": "Détails du client",
+      "appointments": "Historique des rendez-vous",
+      "no_appointments": "Aucun rendez-vous pour le moment"
+    },
+    "form": {
+      "title": "Informations du client",
+      "name": "Nom complet",
+      "email": "Adresse e-mail",
+      "phone": "Numéro de téléphone",
+      "car_type": "Type de véhicule",
+      "notes": "Notes",
+      "active": "Client actif"
+    },
+    "delete": {
+      "title": "Supprimer le client",
+      "confirm": "Êtes-vous sûr de vouloir supprimer {{name}} ?",
+      "description": "Êtes-vous sûr de vouloir supprimer ce client ?",
+      "success": "Client supprimé",
+      "error": "Échec de la suppression du client"
+    }
+  },
+  "workers": {
+    "title": "Employés",
+    "add": "Ajouter un employé",
+    "all": "Tous les employés",
+    "loading": "Chargement des employés...",
+    "error": "Échec du chargement des employés",
+    "no_workers": "Aucun employé trouvé",
+    "specialties": "Spécialités",
+    "created": "Employé créé avec succès",
+    "deleted": "Employé supprimé",
+    "specialty_options": {
+      "exterior-wash": "Lavage extérieur",
+      "interior-cleaning": "Nettoyage intérieur",
+      "detailing": "Detailing",
+      "polishing": "Polissage"
+    },
+    "specialties": {
+      "exterior-wash": "Lavage extérieur",
+      "interior-cleaning": "Nettoyage intérieur",
+      "detailing": "Detailing",
+      "polishing": "Polissage"
+    },
+    "schedule": {
+      "title": "Disponibilité des employés",
+      "description": "Attribuer des dates et horaires de travail à chaque employé",
+      "assign_range": "Attribuer une plage de dates",
+      "start_date": "Date de début",
+      "end_date": "Date de fin",
+      "start_time": "Heure de début",
+      "end_time": "Heure de fin",
+      "assign": "Attribuer les dates",
+      "assigned": "{{count}} jours attribués",
+      "deleted": "Disponibilité supprimée",
+      "no_dates": "Aucune date attribuée pour ce mois",
+      "remove_day": "Marquer le jour comme non travaillé",
+      "mark_off": "Retirer le jour",
+      "day_removed": "Jour marqué comme non travaillé",
+      "updated": "Horaires mis à jour",
+      "date": "Date",
+      "select_worker": "Sélectionnez un employé pour gérer son planning",
+      "tabs": {
+        "schedule": "Planning",
+        "assign": "Attribuer des heures",
+        "dayOff": "Jour de repos"
+      }
+    },
+    "form": {
+      "name": "Nom complet",
+      "email": "Adresse e-mail",
+      "phone": "Numéro de téléphone",
+      "specialties": "Spécialités",
+      "active": "Employé actif"
+    },
+    "delete": {
+      "title": "Supprimer l'employé",
+      "confirm": "Êtes-vous sûr de vouloir supprimer {{name}} ?",
+      "description": "Êtes-vous sûr de vouloir supprimer cet employé ?",
+      "success": "Employé supprimé",
+      "error": "Échec de la suppression de l'employé"
+    }
+  }
+}

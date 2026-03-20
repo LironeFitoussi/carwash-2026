@@ -14,6 +14,7 @@ import { searchClients } from '@/services/clients';
 import { getNextAvailable } from '@/services/appointments';
 import { getCarSizeConfigs } from '@/services/carSizeConfig';
 import useDebounce from '@/hooks/useDebounce';
+import { utcToDatetimeLocal } from '@/lib/utils';
 import type { CreateAppointmentInput, VehicleType, CarType } from '@/types';
 
 const appointmentFormSchema = z.object({
@@ -96,11 +97,7 @@ export default function AppointmentForm({ initialData, onSubmit, isLoading }: Ap
     const suggestMutation = useMutation({
         mutationFn: () => getNextAvailable(selectedWorkerId, selectedVehicleType),
         onSuccess: (data) => {
-            // Convert ISO to datetime-local format
-            const date = new Date(data.suggestedTime);
-            const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
-            const formatted = local.toISOString().slice(0, 16);
-            setValue('startTime', formatted);
+            setValue('startTime', utcToDatetimeLocal(data.suggestedTime));
         },
     });
 
